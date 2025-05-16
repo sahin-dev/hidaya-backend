@@ -1,6 +1,55 @@
-/* eslint-disable no-unused-vars */
 import { z } from 'zod';
-// import { parsePhoneNumberFromString } from 'libphonenumber-js';
+
+const createSchema = z.object({
+  body: z.object({
+    fullName: z
+      .string({
+        required_error: 'Full name is required',
+      })
+      .min(3, { message: 'Full name must be at least 3 characters long' })
+      .max(30, { message: 'Full name cannot exceed 30 characters' })
+      .regex(/^[a-zA-Z\s]+$/, {
+        message: 'Full name can only contain letters and spaces',
+      }),
+    email: z
+      .string({
+        required_error: 'Email is required',
+      })
+      .email({ message: 'Invalid email format' }),
+    password: z
+      .string({
+        required_error: 'Password is required',
+      })
+      .min(6, { message: 'Password must be at least 6 characters long' })
+      .max(20, { message: 'Password cannot exceed 20 characters' })
+      .regex(/[A-Z]/, {
+        message: 'Password must contain at least one uppercase letter',
+      })
+      .regex(/[a-z]/, {
+        message: 'Password must contain at least one lowercase letter',
+      })
+      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
+      .regex(/[@$!%*?&#]/, {
+        message: 'Password must contain at least one special character',
+      }),
+  }),
+});
+
+const verifyOtpSchema = z.object({
+  body: z.object({
+    email: z
+      .string({
+        required_error: 'Email is required',
+      })
+      .email({ message: 'Invalid email format' }),
+    otp: z
+      .string({
+        required_error: 'OTP is required',
+      })
+      .regex(/^\d+$/, { message: 'OTP must be a number' })
+      .length(6, { message: 'OTP must be exactly 6 digits' }),
+  }),
+});
 
 const signinSchema = z.object({
   body: z.object({
@@ -62,17 +111,6 @@ const passwordChangeSchema = z.object({
       .regex(/[@$!%*?&#]/, {
         message: 'New password must contain at least one special character',
       }),
-  }),
-});
-
-const otpSchema = z.object({
-  body: z.object({
-    otp: z
-      .string({
-        required_error: 'OTP is required',
-      })
-      .regex(/^\d+$/, { message: 'OTP must be a number' })
-      .length(6, { message: 'OTP must be exactly 6 digits' }),
   }),
 });
 
@@ -147,45 +185,6 @@ const accessTokenSchema = z.object({
   }),
 });
 
-const createSchema = z.object({
-  body: z.object({
-    fullName: z
-      .string({
-        required_error: 'Full name is required',
-      })
-      .min(3, { message: 'Full name must be at least 3 characters long' })
-      .max(30, { message: 'Full name cannot exceed 30 characters' })
-      .regex(/^[a-zA-Z\s]+$/, {
-        message: 'Full name can only contain letters and spaces',
-      })
-      .optional(),
-    email: z
-      .string({
-        required_error: 'Email is required',
-      })
-      .email({ message: 'Invalid email format' })
-      .optional(),
-
-    password: z
-      .string({
-        required_error: 'Password is required',
-      })
-      .min(6, { message: 'Password must be at least 6 characters long' })
-      .max(20, { message: 'Password cannot exceed 20 characters' })
-      .regex(/[A-Z]/, {
-        message: 'Password must contain at least one uppercase letter',
-      })
-      .regex(/[a-z]/, {
-        message: 'Password must contain at least one lowercase letter',
-      })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
-      .regex(/[@$!%*?&#]/, {
-        message: 'Password must contain at least one special character',
-      })
-      .optional(),
-  }),
-});
-
 const socialSchema = z.object({
   body: z.object({
     email: z
@@ -201,17 +200,18 @@ const socialSchema = z.object({
 });
 
 export type TRegisterPayload = z.infer<typeof createSchema.shape.body>;
+export type TOtpPayload = z.infer<typeof verifyOtpSchema.shape.body>;
 
 export const AuthValidation = {
+  createSchema,
+  verifyOtpSchema,
   signinSchema,
   passwordChangeSchema,
-  otpSchema,
   forgetPasswordSchema,
   resetPasswordSchema,
   resendOtpSchema,
   refreshTokenSchema,
   accessTokenSchema,
-  createSchema,
   socialSchema,
   forgetPasswordVerifySchema,
 };
