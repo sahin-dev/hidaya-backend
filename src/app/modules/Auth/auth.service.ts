@@ -8,13 +8,13 @@ import config from '../../config';
 import { AppError, Logger, sendOtpEmail } from '../../utils';
 import status from 'http-status';
 import Auth from './auth.model';
-import { AuthValidation } from './auth.validation';
+import { AuthValidation, TOtpPayload } from './auth.validation';
 import bcrypt from 'bcryptjs';
 import { TSocialLoginPayload } from '../../types';
 import fs from 'fs';
 import { z } from 'zod';
 
-const createAuth = async (payload: IAuth) => {
+const saveUserIntoDB = async (payload: IAuth) => {
   const existingUser = await Auth.findOne({ email: payload.email });
 
   if (existingUser) {
@@ -24,11 +24,29 @@ const createAuth = async (payload: IAuth) => {
   const otp = generateOtp();
   await sendOtpEmail(payload.email, otp, payload.fullName);
 
-  const token = jwt.sign({ ...payload, otp }, config.jwt_access_secret!, {
-    expiresIn: '10m',
-  });
+  payload.otp = otp;
+  payload.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-  return { token, otp };
+  await Auth.create(payload);
+
+  return null;
+};
+
+const verifyOtpIntoDB = async (payload: TOtpPayload) => {
+  const user = await Auth.findOne({ email: payload.email });
+
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, 'User not exists!');
+  }
+
+  if (user.otpExpiry <= new Date()) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'OTP has expired. Please request a new one.'
+    );
+  }
+
+  //! working on this 
 };
 
 const signupOtpSendAgain = async (token: string) => {
@@ -325,7 +343,8 @@ const resetPasswordIntoDB = async (
 };
 
 export const AuthService = {
-  createAuth,
+  saveUserIntoDB,
+  verifyOtpIntoDB,
   saveAuthIntoDB,
   signupOtpSendAgain,
   signinIntoDB,
