@@ -10,7 +10,7 @@ const authSchema = new mongoose.Schema<IAuth>(
   {
     fullName: {
       type: String,
-      required: [true, 'Please provide a name'],
+      required: [true, 'Please provide a full name'],
       trim: true,
       maxlength: [50, 'Name cannot be more than 50 characters'],
     },
@@ -51,11 +51,23 @@ const authSchema = new mongoose.Schema<IAuth>(
       type: String,
       default: null,
     },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
+    },
     notifications: {
       type: Boolean,
       default: true,
     },
     isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isBlocked: {
       type: Boolean,
       default: false,
     },

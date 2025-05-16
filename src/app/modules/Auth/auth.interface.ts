@@ -10,8 +10,11 @@ export interface IAuth extends Document {
   isSocialLogin: boolean;
   provider: TProvider;
   refreshToken: string;
+  otp: string;
+  otpExpiry: Date;
   notifications: boolean;
   isVerified: boolean;
+  isBlocked: boolean;
   createdAt: Date;
   updatedAt: Date;
   generateAccessToken(): string;

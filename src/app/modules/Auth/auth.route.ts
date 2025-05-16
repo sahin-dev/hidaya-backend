@@ -8,16 +8,20 @@ const router = Router();
 
 router
   .route('/signup')
+  .post(validateRequest(AuthValidation.createSchema), AuthController.signup);
+
+router
+  .route('/verify-signup-otp')
   .post(
-    validateRequest(AuthValidation.createSchema),
-    AuthController.createAuth
+    validateRequest(AuthValidation.verifyOtpSchema),
+    AuthController.signupVerification
   );
+
+//! On progress
 
 router
   .route('/signin')
   .post(validateRequest(AuthValidation.signinSchema), AuthController.signin);
-
-router.route('/verify-signup-otp').post(AuthController.saveAuthData);
 
 router
   .route('/verify-signup-otp-again')

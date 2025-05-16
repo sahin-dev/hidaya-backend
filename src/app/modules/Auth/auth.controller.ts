@@ -3,13 +3,23 @@ import { AppResponse, asyncHandler, options } from '../../utils';
 import { AuthService } from './auth.service';
 import { CookieOptions } from 'express';
 
-const createAuth = asyncHandler(async (req, res) => {
-  const result = await AuthService.createAuth(req.body);
+const signup = asyncHandler(async (req, res) => {
+  await AuthService.saveUserIntoDB(req.body);
+
+  res
+    .status(status.CREATED)
+    .json(new AppResponse(status.CREATED, null, 'OTP send successfully'));
+});
+
+const signupVerification = asyncHandler(async (req, res) => {
+  const result = await AuthService.verifyOtpIntoDB(req.body);
 
   res
     .status(status.OK)
-    .json(new AppResponse(status.OK, result, 'OTP send successfully'));
+    .json(new AppResponse(status.OK, result, 'Account created successfully'));
 });
+
+//! Progressing
 
 const signupOtpSendAgain = asyncHandler(async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1] || '';
@@ -37,8 +47,6 @@ const saveAuthData = asyncHandler(async (req, res) => {
       )
     );
 });
-
-
 
 const signin = asyncHandler(async (req, res) => {
   const result = await AuthService.signinIntoDB(req.body);
@@ -119,10 +127,9 @@ const resetPassword = asyncHandler(async (req, res) => {
     .json(new AppResponse(status.OK, result, 'Reset password successfully'));
 });
 
-
-
 export const AuthController = {
-  createAuth,
+  signup,
+  signupVerification,
   saveAuthData,
   signupOtpSendAgain,
   signin,
