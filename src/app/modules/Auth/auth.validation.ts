@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PROVIDER } from './auth.constant';
 
 const createSchema = z.object({
   body: z.object({
@@ -58,6 +59,24 @@ const emailSchema = z.object({
         required_error: 'Email is required',
       })
       .email({ message: 'Invalid email format' }),
+  }),
+});
+
+const socialSchema = z.object({
+  body: z.object({
+    email: z
+      .string()
+      .email('Invalid email address')
+      .nonempty('Email is required'),
+    fcmToken: z.string().nonempty('FCM Token is required'),
+    provider: z.enum([PROVIDER.GOOGLE, PROVIDER.FACEBOOK, PROVIDER.APPLE], {
+      message: 'Provider must be one of: GOOGLE, FACEBOOK, or APPLE.',
+    }),
+
+    image: z.string().url('Image URL must be a valid URL').optional(),
+    fullName: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    address: z.string().optional(),
   }),
 });
 
@@ -194,20 +213,6 @@ const accessTokenSchema = z.object({
     accessToken: z.string({
       required_error: 'Refresh token is required!',
     }),
-  }),
-});
-
-const socialSchema = z.object({
-  body: z.object({
-    email: z
-      .string()
-      .email('Invalid email address')
-      .nonempty('Email is required'),
-    fcmToken: z.string().nonempty('FCM Token is required'),
-    image: z.string().url('Image URL must be a valid URL').optional(),
-    fullName: z.string().optional(),
-    phoneNumber: z.string().optional(),
-    address: z.string().optional(),
   }),
 });
 

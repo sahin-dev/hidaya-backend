@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { generateOtp, verifyToken } from '../../lib';
 import { IAuth } from './auth.interface';
 import config from '../../config';
@@ -13,6 +13,7 @@ import { TSocialLoginPayload } from '../../types';
 import fs from 'fs';
 import { z } from 'zod';
 
+// Create a new account
 const saveUserIntoDB = async (payload: IAuth) => {
   const existingUser = await Auth.findOne({ email: payload.email });
 
@@ -92,42 +93,7 @@ const resendOtpAgain = async (email: string) => {
   return null;
 };
 
-//! working on this
-
-const saveAuthIntoDB = async (token: string, otp: number) => {
-  const decoded = jwt.verify(token, config.jwt_access_secret!) as JwtPayload;
-
-  const existingUser = await Auth.findOne({ email: decoded.email });
-
-  if (existingUser) {
-    throw new AppError(status.BAD_REQUEST, 'User already exists');
-  }
-
-  if (decoded?.otp !== otp) {
-    throw new AppError(status.BAD_REQUEST, 'Invalid OTP');
-  }
-
-  const result = await Auth.create({
-    fullName: decoded.fullName,
-    phoneNumber: decoded.phoneNumber,
-    email: decoded.email,
-    password: decoded.password,
-    isVerified: true,
-  });
-
-  if (!result) {
-    throw new AppError(
-      status.INTERNAL_SERVER_ERROR,
-      'Failed to save user info'
-    );
-  }
-
-  const accessToken = result.generateAccessToken();
-  const refreshToken = result.generateRefreshToken();
-
-  return { accessToken, refreshToken };
-};
-
+// For signin
 const signinIntoDB = async (payload: { email: string; password: string }) => {
   const user = await Auth.findOne({ email: payload.email }).select('+password');
 
@@ -154,6 +120,9 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
 
+  user.refreshToken = refreshToken;
+  await user.save();
+
   return {
     _id: user._id,
     fullName: user.fullName,
@@ -164,6 +133,7 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
   };
 };
 
+// Social signin service
 const socialLoginServices = async (payload: TSocialLoginPayload) => {
   const { email, fcmToken, image, fullName, address } = payload;
 
@@ -194,12 +164,10 @@ const socialLoginServices = async (payload: TSocialLoginPayload) => {
     await Auth.findByIdAndUpdate(authRes._id, { refreshToken });
 
     return {
-      response: {
-        fullName: authRes.fullName,
-        email: authRes.email,
-        role: authRes.role,
-        image: authRes.image,
-      },
+      fullName: authRes.fullName,
+      email: authRes.email,
+      role: authRes.role,
+      image: authRes.image,
       accessToken,
       refreshToken,
     };
@@ -211,17 +179,17 @@ const socialLoginServices = async (payload: TSocialLoginPayload) => {
     await auth.save({ validateBeforeSave: false });
 
     return {
-      response: {
-        fullName: auth.fullName,
-        email: auth.email,
-        role: auth.role,
-        image: auth.image,
-      },
+      fullName: auth.fullName,
+      email: auth.email,
+      role: auth.role,
+      image: auth.image,
       accessToken,
       refreshToken,
     };
   }
 };
+
+//! working on this
 
 const updateProfilePhoto = async (
   user: IAuth,
@@ -372,7 +340,6 @@ const resetPasswordIntoDB = async (
 export const AuthService = {
   saveUserIntoDB,
   verifyOtpIntoDB,
-  saveAuthIntoDB,
   resendOtpAgain,
   signinIntoDB,
   socialLoginServices,

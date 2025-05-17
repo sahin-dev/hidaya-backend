@@ -21,13 +21,9 @@ router
   .route('/resend')
   .post(validateRequest(AuthValidation.emailSchema), AuthController.resentOtp);
 
-//! On progress
-
 router
   .route('/signin')
   .post(validateRequest(AuthValidation.signinSchema), AuthController.signin);
-
-router.route('/verify-signup-otp-again').post(AuthController.resentOtp);
 
 router
   .route('/social-signin')
@@ -35,6 +31,10 @@ router
     validateRequest(AuthValidation.socialSchema),
     AuthController.socialSignin
   );
+
+//! On progress
+
+router.route('/verify-signup-otp-again').post(AuthController.resentOtp);
 
 router
   .route('/change-password')
