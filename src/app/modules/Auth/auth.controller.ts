@@ -51,7 +51,27 @@ const socialSignin = asyncHandler(async (req, res) => {
     .json(new AppResponse(status.OK, result, 'Signin successfully'));
 });
 
-//! Progressing
+const signout = asyncHandler(async (req, res) => {
+  await AuthService.signoutFromDB(req.user);
+
+  res
+    .status(status.OK)
+    .clearCookie('accessToken')
+    .clearCookie('refreshToken')
+    .json(new AppResponse(status.OK, null, 'Signout successfully'));
+});
+
+const updateProfile = asyncHandler(async (req, res) => {
+  const result = await AuthService.updateProfileIntoDB(
+    req.user,
+    req.body,
+    req.file
+  );
+
+  res
+    .status(status.OK)
+    .json(new AppResponse(status.OK, result, 'Profile update successfully'));
+});
 
 const updateProfilePhoto = asyncHandler(async (req, res) => {
   const result = await AuthService.updateProfilePhoto(req.user, req.file);
@@ -84,7 +104,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
       new AppResponse(
         status.OK,
         result,
-        'Your OTP has been successfully sent to your email. If you do not find the email in your inbox, please check your spam or junk folder.'
+        'Your OTP has been successfully sent to your email.'
       )
     );
 });
@@ -98,11 +118,11 @@ const verifyOtpForForgetPassword = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const resetPasswordToken =
+  const resetToken =
     req.header('Authorization')?.replace('Bearer ', '') ||
     req.cookies?.resetPasswordToken;
   const result = await AuthService.resetPasswordIntoDB(
-    resetPasswordToken,
+    resetToken,
     req.body.newPassword
   );
 
@@ -117,6 +137,8 @@ export const AuthController = {
   resentOtp,
   signin,
   socialSignin,
+  signout,
+  updateProfile,
   updateProfilePhoto,
   changePassword,
   forgetPassword,

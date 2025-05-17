@@ -3,6 +3,7 @@ import { auth, validateRequest } from '../../middlewares';
 import { AuthValidation } from './auth.validation';
 import { AuthController } from './auth.controller';
 import { upload } from '../../lib';
+import { validateRequestFromFormData } from '../../middlewares/validateRequest';
 
 const router = Router();
 
@@ -32,9 +33,20 @@ router
     AuthController.socialSignin
   );
 
-//! On progress
+router.route('/signout').post(auth(), AuthController.signout);
 
-router.route('/verify-signup-otp-again').post(AuthController.resentOtp);
+router
+  .route('/update-profile')
+  .patch(
+    auth(),
+    upload.single('file'),
+    validateRequestFromFormData(AuthValidation.updateSchema),
+    AuthController.updateProfile
+  );
+
+router
+  .route('/profile-image')
+  .put(auth(), upload.single('file'), AuthController.updateProfilePhoto);
 
 router
   .route('/change-password')
@@ -48,7 +60,7 @@ router
 router
   .route('/forget-password')
   .post(
-    validateRequest(AuthValidation.forgetPasswordSchema),
+    validateRequest(AuthValidation.emailSchema),
     AuthController.forgetPassword
   );
 
@@ -61,13 +73,9 @@ router
 
 router
   .route('/reset-password')
-  .post(
+  .patch(
     validateRequest(AuthValidation.resetPasswordSchema),
     AuthController.resetPassword
   );
-
-router
-  .route('/profile-image')
-  .put(auth(), upload.single('file'), AuthController.updateProfilePhoto);
 
 export const AuthRoutes = router;

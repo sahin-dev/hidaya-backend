@@ -9,6 +9,8 @@ export interface IAuth extends Document {
   image?: string;
   isSocialLogin: boolean;
   provider: TProvider;
+  phoneNumber: string;
+  address: string;
   refreshToken: string;
   otp: string | null;
   otpExpiry: Date | null;

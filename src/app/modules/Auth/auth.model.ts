@@ -47,6 +47,14 @@ const authSchema = new mongoose.Schema<IAuth>(
       enum: Object.values(PROVIDER),
       default: null,
     },
+    address: {
+      type: String,
+      default: null,
+    },
+    phoneNumber: {
+      type: String,
+      default: null,
+    },
     refreshToken: {
       type: String,
       default: null,

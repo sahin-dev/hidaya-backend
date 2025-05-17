@@ -7,7 +7,7 @@ import config from '../../config';
 import { AppError, Logger, sendOtpEmail } from '../../utils';
 import status from 'http-status';
 import Auth from './auth.model';
-import { AuthValidation, TOtpPayload } from './auth.validation';
+import { AuthValidation, TOtpPayload, TUpdatePayload } from './auth.validation';
 import bcrypt from 'bcryptjs';
 import { TSocialLoginPayload } from '../../types';
 import fs from 'fs';
@@ -39,15 +39,19 @@ const verifyOtpIntoDB = async (payload: TOtpPayload) => {
     throw new AppError(status.NOT_FOUND, 'User not exists!');
   }
 
-  if (user?.otpExpiry && user?.otpExpiry <= new Date()) {
-    throw new AppError(
-      status.BAD_REQUEST,
-      'OTP has expired. Please request a new one.'
-    );
+  if (!user?.otpExpiry) {
+    throw new AppError(status.BAD_REQUEST, 'Otp does not exists in DB');
   }
 
   if (user?.otp != payload.otp) {
     throw new AppError(status.BAD_REQUEST, 'Invalid otp!');
+  }
+
+  if (Date.now() > new Date(user.otpExpiry).getTime()) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'OTP has expired. Please request a new one.'
+    );
   }
 
   const accessToken = user.generateAccessToken();
@@ -189,7 +193,53 @@ const socialLoginServices = async (payload: TSocialLoginPayload) => {
   }
 };
 
-//! working on this
+const signoutFromDB = async (user: IAuth) => {
+  await Auth.findByIdAndUpdate(user._id, { $set: { refreshToken: null } });
+
+  return null;
+};
+
+const updateProfileIntoDB = async (
+  user: IAuth,
+  payload: TUpdatePayload & { image: string },
+  file: Express.Multer.File | undefined
+) => {
+  try {
+    const auth = await Auth.findOne({
+      _id: user._id,
+      isBlocked: false,
+      isVerified: true,
+    });
+
+    if (!auth) {
+      throw new AppError(status.NOT_FOUND, 'User not exists!');
+    }
+
+    if (file?.path) {
+      if (user?.image) {
+        try {
+          await fs.promises.unlink(user.image);
+        } catch (error: unknown) {
+          Logger.error('Error deleting old file:', error);
+        }
+      }
+
+      payload.image = file.path;
+    }
+
+    return await Auth.findByIdAndUpdate(user._id, payload, {
+      new: true,
+    }).select('fullName email image role address phoneNumber');
+  } catch {
+    if (file?.path) {
+      try {
+        await fs.promises.unlink(file.path);
+      } catch (error: unknown) {
+        Logger.error('Error deleting old file:', error);
+      }
+    }
+  }
+};
 
 const updateProfilePhoto = async (
   user: IAuth,
@@ -212,7 +262,7 @@ const updateProfilePhoto = async (
     user._id,
     { image: file.path },
     { new: true }
-  ).select('fullName email image role isProfile phoneNumber');
+  ).select('fullName email image role');
 
   return res;
 };
@@ -223,9 +273,11 @@ const changePasswordIntoDB = async (
 ) => {
   const { id } = await verifyToken(accessToken);
 
-  const user = await Auth.findOne({ _id: id, isActive: true }).select(
-    '+password'
-  );
+  const user = await Auth.findOne({
+    _id: id,
+    isVerified: true,
+    isBlocked: false,
+  }).select('+password');
 
   if (!user) {
     throw new AppError(status.NOT_FOUND, 'User not exists');
@@ -247,7 +299,11 @@ const changePasswordIntoDB = async (
 };
 
 const forgotPassword = async (email: string) => {
-  const user = await Auth.findOne({ email, isActive: true });
+  const user = await Auth.findOne({
+    email,
+    isVerified: true,
+    isBlocked: false,
+  });
 
   if (!user) {
     throw new AppError(status.NOT_FOUND, 'User not found');
@@ -257,50 +313,43 @@ const forgotPassword = async (email: string) => {
   await user.save();
   await sendOtpEmail(email, otp, user.fullName || 'Guest');
 
-  const token = jwt.sign(
-    {
-      email,
-      verificationCode: otp,
-      verificationExpiry: new Date(Date.now() + 5 * 60 * 1000),
-    },
-    config.jwt_access_secret!,
-    {
-      expiresIn: '5m',
-    }
-  );
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-  return { token };
+  await Auth.findByIdAndUpdate(user._id, {
+    $set: { otp, otpExpiry, refreshToken: null },
+  });
+
+  return { email };
 };
 
 const verifyOtpForForgetPassword = async (payload: {
-  token: string;
+  email: string;
   otp: string;
 }) => {
-  const { email, verificationCode, verificationExpiry } = (await verifyToken(
-    payload.token
-  )) as any;
-  const user = await Auth.findOne({ email, isActive: true });
+  const user = await Auth.findOne({
+    email: payload.email,
+    isVerified: true,
+    isBlocked: false,
+  });
 
   if (!user) {
     throw new AppError(status.NOT_FOUND, 'User not found');
   }
 
   // Check if the OTP matches
-  if (verificationCode !== payload.otp || !verificationExpiry) {
+  if (user?.otp !== payload.otp || !user.otpExpiry) {
     throw new AppError(status.BAD_REQUEST, 'Invalid OTP');
   }
 
-  console.log({ verificationExpiry });
-
   // Check if OTP has expired
-  if (Date.now() > new Date(verificationExpiry).getTime()) {
+  if (Date.now() > new Date(user.otpExpiry).getTime()) {
     throw new AppError(status.BAD_REQUEST, 'OTP has expired');
   }
 
-  const resetPasswordToken = jwt.sign(
+  const resetToken = jwt.sign(
     {
       email: user.email,
-      isResetPassword: true,
+      isResetPassword: '1994',
     },
     config.jwt_access_secret!,
     {
@@ -308,26 +357,25 @@ const verifyOtpForForgetPassword = async (payload: {
     }
   );
 
-  return { resetPasswordToken };
+  return { resetToken };
 };
 
-const resetPasswordIntoDB = async (
-  resetPasswordToken: string,
-  newPassword: string
-) => {
-  const { email, isResetPassword } = (await verifyToken(
-    resetPasswordToken
-  )) as any;
+const resetPasswordIntoDB = async (resetToken: string, newPassword: string) => {
+  const { email, isResetPassword } = (await verifyToken(resetToken)) as any;
 
-  const user = await Auth.findOne({ email, isActive: true });
+  const user = await Auth.findOne({
+    email,
+    isVerified: true,
+    isBlocked: false,
+  });
 
   if (!user) {
     throw new AppError(status.NOT_FOUND, 'User not found');
   }
 
   // Check if the OTP matches
-  if (!isResetPassword) {
-    throw new AppError(status.BAD_REQUEST, 'Invalid reset password token or ');
+  if (isResetPassword !== '1994') {
+    throw new AppError(status.BAD_REQUEST, 'Invalid reset password token.');
   }
 
   // Update the user's password
@@ -343,6 +391,8 @@ export const AuthService = {
   resendOtpAgain,
   signinIntoDB,
   socialLoginServices,
+  signoutFromDB,
+  updateProfileIntoDB,
   updateProfilePhoto,
   changePasswordIntoDB,
   forgotPassword,
