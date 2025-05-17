@@ -2,7 +2,6 @@ import status from 'http-status';
 import nodemailer from 'nodemailer';
 import config from '../config';
 import AppError from './AppError';
-import path from 'path';
 
 const sendOtpEmail = async (email: string, otp: string, fullName: string) => {
   try {
@@ -20,97 +19,110 @@ const sendOtpEmail = async (email: string, otp: string, fullName: string) => {
           <!DOCTYPE html>
           <html lang="en">
           <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
             <style>
               body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
+                font-family: 'Arial', sans-serif;
+                background-color: #faf9f6;
                 margin: 0;
                 padding: 0;
+                color: #333;
               }
               .container {
-                width: 100%;
                 max-width: 600px;
                 margin: 0 auto;
                 background-color: #ffffff;
-                padding: 20px;
                 border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
               }
               .header {
                 text-align: center;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #f0f0f0;
+                padding: 20px;
+                background-color: #f7e7d1;
+                border-bottom: 2px solid #e6c9a8;
               }
               .header img {
-                max-width: 150px;
-                margin-bottom: 20px;
+                width: 150px;
+                max-width: 100%;
+                display: block;
+                margin: 0 auto 15px;
+                border-radius: 12px;
               }
               .header h2 {
-                color: #816A6B; /* Steady Hands theme color */
+                color: #a56b4f;
+                margin: 0 0 8px;
+                font-weight: bold;
+                font-size: 24px;
+                font-family: 'Georgia', serif;
+              }
+              .content {
+                padding: 20px;
+                font-size: 16px;
+                line-height: 1.5;
+                color: #5c4a3d;
               }
               .otp {
-                font-size: 24px;
-                font-weight: bold;
-                color: #816A6B;
-                padding: 12px;
-                background-color: #fff8e1;
-                border-left: 4px solid #816A6B;
+                background-color: #fcefcf;
+                border-left: 5px solid #a56b4f;
+                padding: 15px;
+                font-size: 28px;
+                font-weight: 700;
                 text-align: center;
-                margin: 20px 0;
+                margin: 25px 0;
+                font-family: 'Courier New', Courier, monospace;
+                letter-spacing: 6px;
+                color: #7a563f;
+                user-select: all;
               }
               .footer {
                 text-align: center;
-                font-size: 12px;
-                color: #888888;
-                padding-top: 20px;
-                border-top: 2px solid #f0f0f0;
+                padding: 15px 20px;
+                font-size: 13px;
+                color: #a99a8a;
+                border-top: 2px solid #e6c9a8;
+                font-style: italic;
               }
-              @media only screen and (max-width: 600px) {
+              @media (max-width: 600px) {
                 .container {
-                  padding: 15px;
-                }
-                .otp {
-                  font-size: 20px;
-                  padding: 10px;
-                }
-                .footer {
-                  font-size: 10px;
+                  width: 90%;
                 }
                 .header h2 {
+                  font-size: 20px;
+                }
+                .otp {
                   font-size: 22px;
+                  padding: 12px;
+                  letter-spacing: 4px;
                 }
               }
             </style>
           </head>
           <body>
-
             <div class="container">
               <div class="header">
-                <img src="cid:steady_hands_logo" alt="Steady Hands Logo"> <!-- Ensure this is the correct logo path -->
-                <h2>Thank You for Joining Steady Hands!</h2>
-                <p>We're excited to help you grow your studio.</p>
+                <h2>Welcome to Hidaya</h2>
+                <p>Your journey to spiritual growth starts here</p>
               </div>
-
-              <p>Hello ${fullName},</p>
-              <p>We received a request to verify your email address. Your one-time password (OTP) is:</p>
-
-              <div class="otp">
-                ${otp}
+              <div class="content">
+                <p>Assalamu Alaikum ${fullName},</p>
+                <p>Thank you for joining <strong>Hidaya - Your Islamic Tracker</strong>. To verify your email and activate your account, please use the one-time password (OTP) below:</p>
+                <div class="otp">${otp}</div>
+                <p>Please enter this OTP to complete your email verification. It will expire in 5 minutes.</p>
+                <p>May your journey be blessed and fruitful.</p>
               </div>
-
-              <p>Please enter this OTP to complete your email verification and start using Steady Hands to grow your studio.</p>
-              <p><strong>Note:</strong> This OTP will expire in 5 minutes. Be sure to enter it before it expires.</p>
-
               <div class="footer">
-                <p>Thank you for being a part of Steady Hands. If you did not request this, please ignore this email.</p>
+                <p>If you did not request this verification, please ignore this email.</p>
+                <p>© 2025 Hidaya. All rights reserved.</p>
               </div>
             </div>
-
           </body>
           </html>
+
   `;
+
+    // <img src="cid:steady_hands_logo" alt="Steady Hands Logo">
 
     // Email options: from, to, subject, and HTML body
     const mailOptions = {
@@ -118,13 +130,13 @@ const sendOtpEmail = async (email: string, otp: string, fullName: string) => {
       to: email, // Recipient's email address
       subject: 'Your OTP for Account Verification',
       html: htmlTemplate,
-      attachments: [
-        {
-          filename: 'logo.png',
-          path: path.join(__dirname, 'assets', 'logo.png'),
-          cid: 'steady_hands_logo',
-        },
-      ],
+      // attachments: [
+      //   {
+      //     filename: 'logo.png',
+      //     path: path.join(__dirname, 'assets', 'logo.png'),
+      //     cid: 'steady_hands_logo',
+      //   },
+      // ],
     };
 
     // Send the email using Nodemailer

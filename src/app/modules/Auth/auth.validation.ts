@@ -51,6 +51,18 @@ const verifyOtpSchema = z.object({
   }),
 });
 
+const emailSchema = z.object({
+  body: z.object({
+    email: z
+      .string({
+        required_error: 'Email is required',
+      })
+      .email({ message: 'Invalid email format' }),
+  }),
+});
+
+//! Working process
+
 const signinSchema = z.object({
   body: z.object({
     email: z
@@ -205,6 +217,7 @@ export type TOtpPayload = z.infer<typeof verifyOtpSchema.shape.body>;
 export const AuthValidation = {
   createSchema,
   verifyOtpSchema,
+  emailSchema,
   signinSchema,
   passwordChangeSchema,
   forgetPasswordSchema,

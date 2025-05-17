@@ -7,28 +7,31 @@ const signup = asyncHandler(async (req, res) => {
   await AuthService.saveUserIntoDB(req.body);
 
   res
-    .status(status.CREATED)
-    .json(new AppResponse(status.CREATED, null, 'OTP send successfully'));
+    .status(status.OK)
+    .json(new AppResponse(status.OK, null, 'OTP send successfully'));
 });
 
 const signupVerification = asyncHandler(async (req, res) => {
   const result = await AuthService.verifyOtpIntoDB(req.body);
 
   res
-    .status(status.OK)
-    .json(new AppResponse(status.OK, result, 'Account created successfully'));
+    .status(status.CREATED)
+    .cookie('accessToken', result.accessToken, options as CookieOptions)
+    .cookie('refreshToken', result.refreshToken, options as CookieOptions)
+    .json(
+      new AppResponse(status.CREATED, result, 'Account created successfully')
+    );
 });
 
-//! Progressing
-
-const signupOtpSendAgain = asyncHandler(async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1] || '';
-  const result = await AuthService.signupOtpSendAgain(token);
+const resentOtp = asyncHandler(async (req, res) => {
+  const result = await AuthService.resendOtpAgain(req.body.email);
 
   res
     .status(status.OK)
-    .json(new AppResponse(status.OK, result, 'OTP send again successfully'));
+    .json(new AppResponse(status.OK, result, 'Resend otp send successfully'));
 });
+
+//! Progressing
 
 const saveAuthData = asyncHandler(async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1] || '';
@@ -131,7 +134,7 @@ export const AuthController = {
   signup,
   signupVerification,
   saveAuthData,
-  signupOtpSendAgain,
+  resentOtp,
   signin,
   socialSignin,
   updateProfilePhoto,

@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { generateOtp, verifyToken } from '../../lib';
-import sendOtpSms from '../../utils/sendOtpSms';
 import { IAuth } from './auth.interface';
 import config from '../../config';
 import { AppError, Logger, sendOtpEmail } from '../../utils';
@@ -39,33 +38,61 @@ const verifyOtpIntoDB = async (payload: TOtpPayload) => {
     throw new AppError(status.NOT_FOUND, 'User not exists!');
   }
 
-  if (user.otpExpiry <= new Date()) {
+  if (user?.otpExpiry && user?.otpExpiry <= new Date()) {
     throw new AppError(
       status.BAD_REQUEST,
       'OTP has expired. Please request a new one.'
     );
   }
 
-  //! working on this 
+  if (user?.otp != payload.otp) {
+    throw new AppError(status.BAD_REQUEST, 'Invalid otp!');
+  }
+
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  const data = await Auth.findByIdAndUpdate(user._id, {
+    $set: { otp: null, otpExpiry: null, refreshToken, isVerified: true },
+  }).select('fullName image email role');
+
+  if (!data) {
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Something went wrong to verify user into db'
+    );
+  }
+
+  return { ...data.toObject(), accessToken, refreshToken };
 };
 
-const signupOtpSendAgain = async (token: string) => {
-  const decoded = jwt.decode(token) as JwtPayload;
+const resendOtpAgain = async (email: string) => {
+  const user = await Auth.findOne({ email });
 
-  const authData = {
-    email: decoded.email,
-    phoneNumber: decoded.phoneNumber,
-    password: decoded.password,
-  };
+  if (!user) {
+    throw new AppError(status.NOT_FOUND, 'Account not exists!');
+  }
 
   const otp = generateOtp();
-  await sendOtpSms(decoded.phoneNumber, otp);
-  const newToken = jwt.sign({ ...authData, otp }, config.jwt_access_secret!, {
-    expiresIn: '5m',
+  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+  await sendOtpEmail(email, otp, user.fullName);
+
+  const data = await Auth.findByIdAndUpdate(user._id, {
+    $set: { otp, otpExpiry },
   });
 
-  return { token: newToken, otp };
+  if (!data) {
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Something went wrong to verify user into db'
+    );
+  }
+
+  return null;
 };
+
+//! working on this
 
 const saveAuthIntoDB = async (token: string, otp: number) => {
   const decoded = jwt.verify(token, config.jwt_access_secret!) as JwtPayload;
@@ -346,7 +373,7 @@ export const AuthService = {
   saveUserIntoDB,
   verifyOtpIntoDB,
   saveAuthIntoDB,
-  signupOtpSendAgain,
+  resendOtpAgain,
   signinIntoDB,
   socialLoginServices,
   updateProfilePhoto,

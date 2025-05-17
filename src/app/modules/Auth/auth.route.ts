@@ -17,15 +17,17 @@ router
     AuthController.signupVerification
   );
 
+router
+  .route('/resend')
+  .post(validateRequest(AuthValidation.emailSchema), AuthController.resentOtp);
+
 //! On progress
 
 router
   .route('/signin')
   .post(validateRequest(AuthValidation.signinSchema), AuthController.signin);
 
-router
-  .route('/verify-signup-otp-again')
-  .post(AuthController.signupOtpSendAgain);
+router.route('/verify-signup-otp-again').post(AuthController.resentOtp);
 
 router
   .route('/social-signin')
