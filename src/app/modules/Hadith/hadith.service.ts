@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import { AppError } from '../../utils';
 import Hadith from './hadith.model';

@@ -6,6 +6,7 @@ import { CategoryRoutes } from '../modules/Category/category.route';
 import { TrackerRoutes } from '../modules/Mood Tracker/tracker.route';
 import { HadithRoutes } from '../modules/Hadith/hadith.routes';
 import { AdminRoutes } from '../modules/Admin/admin.route';
+import { JournalRoutes } from '../modules/Journal/journal.routes';
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: '/admin',
     route: AdminRoutes,
+  },
+  {
+    path: '/journal',
+    route: JournalRoutes,
   },
 ];
 
