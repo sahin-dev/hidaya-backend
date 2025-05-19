@@ -3,7 +3,7 @@ import { AppResponse, asyncHandler } from '../../utils';
 import { CategoryService } from './category.service';
 
 const createCategory = asyncHandler(async (req, res) => {
-  const category = await CategoryService.createCategory(req.body);
+  const category = await CategoryService.createCategory(req.body, req.file);
 
   res
     .status(status.CREATED)

@@ -6,17 +6,29 @@ import { AppError, Logger } from '../../utils';
 import Category from './category.model';
 import { ICategory } from './category.interface';
 
-const createCategory = async (payload: ICategory) => {
+const createCategory = async (
+  payload: ICategory,
+  file: Express.Multer.File | undefined
+) => {
+  if (!file) {
+    throw new AppError(status.BAD_REQUEST, 'Category image is required');
+  }
+
   const existingCategory = await Category.findOne({ name: payload.name });
 
   if (existingCategory) {
     throw new AppError(status.BAD_REQUEST, 'Category already exists');
   }
 
+  payload.image = file.path;
+
   const category = await Category.create(payload);
 
   if (!category) {
-    throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to create category');
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Failed to create category'
+    );
   }
 
   return category;
@@ -63,7 +75,10 @@ const updateCategory = async (
   });
 
   if (!updatedCategory) {
-    throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to update category');
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Failed to update category'
+    );
   }
 
   return updatedCategory;

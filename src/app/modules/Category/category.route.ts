@@ -10,7 +10,7 @@ router
   .route('/')
   .post(
     auth(ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    upload.single('image'),
+    upload.single('file'),
     CategoryController.createCategory
   )
   .get(CategoryController.getAllCategories);
@@ -20,7 +20,7 @@ router
   .get(CategoryController.getCategory)
   .patch(
     auth(ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    upload.single('image'),
+    upload.single('file'),
     CategoryController.updateCategory
   )
   .delete(
