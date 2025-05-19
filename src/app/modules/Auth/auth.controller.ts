@@ -131,6 +131,14 @@ const resetPassword = asyncHandler(async (req, res) => {
     .json(new AppResponse(status.OK, result, 'Reset password successfully'));
 });
 
+const getProfile = asyncHandler(async (req, res) => {
+  const result = await AuthService.getProfileFromDB(req.user);
+
+  res
+    .status(status.OK)
+    .json(new AppResponse(status.OK, result, 'fetch profile successfully'));
+});
+
 export const AuthController = {
   signup,
   signupVerification,
@@ -144,4 +152,5 @@ export const AuthController = {
   forgetPassword,
   verifyOtpForForgetPassword,
   resetPassword,
+  getProfile,
 };

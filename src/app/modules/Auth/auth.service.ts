@@ -385,6 +385,20 @@ const resetPasswordIntoDB = async (resetToken: string, newPassword: string) => {
   return null;
 };
 
+const getProfileFromDB = async (user: IAuth) => {
+  const auth = await Auth.findOne({
+    _id: user._id,
+    isBlocked: false,
+    isVerified: true,
+  }).select('-password -refreshToken -otp -otpExpiry');
+
+  if (!auth) {
+    throw new Error('User not found');
+  }
+
+  return auth;
+};
+
 export const AuthService = {
   saveUserIntoDB,
   verifyOtpIntoDB,
@@ -398,4 +412,5 @@ export const AuthService = {
   forgotPassword,
   verifyOtpForForgetPassword,
   resetPasswordIntoDB,
+  getProfileFromDB,
 };

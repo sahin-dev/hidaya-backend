@@ -78,4 +78,6 @@ router
     AuthController.resetPassword
   );
 
+router.route('/me').get(auth(), AuthController.getProfile);
+
 export const AuthRoutes = router;
