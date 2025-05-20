@@ -7,6 +7,7 @@ import { TrackerRoutes } from '../modules/Mood Tracker/tracker.route';
 import { HadithRoutes } from '../modules/Hadith/hadith.routes';
 import { AdminRoutes } from '../modules/Admin/admin.route';
 import { JournalRoutes } from '../modules/Journal/journal.routes';
+import { ActivityRoutes } from '../modules/Activity Tracker/activity.route';
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const moduleRoutes = [
   {
     path: '/journal',
     route: JournalRoutes,
+  },
+  {
+    path: '/activities',
+    route: ActivityRoutes,
   },
 ];
 
