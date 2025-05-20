@@ -10,7 +10,19 @@ const journalSchema = new Schema<IJournal>(
     },
     content: {
       type: String,
-      required: true,
+      required: [true, 'Content is required'],
+    },
+    water: {
+      type: Number,
+      required: false,
+    },
+    steps: {
+      type: Number,
+      required: false,
+    },
+    calories: {
+      type: Number,
+      required: false,
     },
   },
   {
