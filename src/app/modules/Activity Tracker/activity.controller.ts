@@ -10,7 +10,9 @@ const createActivity = asyncHandler(async (req, res) => {
 
   res
     .status(status.CREATED)
-    .json(new AppResponse(status.CREATED, activity, 'Activity created successfully'));
+    .json(
+      new AppResponse(status.CREATED, activity, 'Activity created successfully')
+    );
 });
 
 const getActivity = asyncHandler(async (req, res) => {
@@ -18,7 +20,9 @@ const getActivity = asyncHandler(async (req, res) => {
 
   res
     .status(status.OK)
-    .json(new AppResponse(status.OK, activity, 'Activity fetched successfully'));
+    .json(
+      new AppResponse(status.OK, activity, 'Activity fetched successfully')
+    );
 });
 
 const getActivitiesByUser = asyncHandler(async (req, res) => {
@@ -28,7 +32,13 @@ const getActivitiesByUser = asyncHandler(async (req, res) => {
 
   res
     .status(status.OK)
-    .json(new AppResponse(status.OK, activities, 'User activities fetched successfully'));
+    .json(
+      new AppResponse(
+        status.OK,
+        activities,
+        'User activities fetched successfully'
+      )
+    );
 });
 
 const getActivitiesForToday = asyncHandler(async (req, res) => {
@@ -38,19 +48,34 @@ const getActivitiesForToday = asyncHandler(async (req, res) => {
 
   res
     .status(status.OK)
-    .json(new AppResponse(status.OK, activities, "Today's activities fetched successfully"));
+    .json(
+      new AppResponse(
+        status.OK,
+        activities,
+        "Today's activities fetched successfully"
+      )
+    );
 });
 
 const updateActivity = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user._id as string;
 
   const payload = req.body;
 
-  const updatedActivity = await ActivityService.updateActivity(userId, { ...payload, user: userId });
+  const updatedActivity = await ActivityService.updateActivity(userId, {
+    ...payload,
+    user: userId,
+  });
 
   res
     .status(status.OK)
-    .json(new AppResponse(status.OK, updatedActivity, 'Activity updated successfully'));
+    .json(
+      new AppResponse(
+        status.OK,
+        updatedActivity,
+        'Activity updated successfully'
+      )
+    );
 });
 
 const deleteActivity = asyncHandler(async (req, res) => {
@@ -61,6 +86,41 @@ const deleteActivity = asyncHandler(async (req, res) => {
     .json(new AppResponse(status.OK, null, 'Activity deleted successfully'));
 });
 
+// New: Get activities by a specific date, query param 'date' in format 'DD-MM-YYYY'
+const getActivitiesByDate = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const dateStr = req.query.date as string;
+
+  const activities = await ActivityService.getActivitiesByDate(userId, dateStr);
+
+  res
+    .status(status.OK)
+    .json(
+      new AppResponse(
+        status.OK,
+        activities,
+        `Activities for date ${dateStr} fetched successfully`
+      )
+    );
+});
+
+// New: Get all activity history for the user
+const getAllActivityHistory = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const activities = await ActivityService.getAllActivityHistory(userId);
+
+  res
+    .status(status.OK)
+    .json(
+      new AppResponse(
+        status.OK,
+        activities,
+        'All activity history fetched successfully'
+      )
+    );
+});
+
 export const ActivityController = {
   createActivity,
   getActivity,
@@ -68,4 +128,6 @@ export const ActivityController = {
   getActivitiesForToday,
   updateActivity,
   deleteActivity,
+  getActivitiesByDate,
+  getAllActivityHistory,
 };

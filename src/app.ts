@@ -25,6 +25,7 @@ app.use(
 );
 app.use(cookieParser());
 
+
 // static files
 app.use('/public', express.static('public'));
 
