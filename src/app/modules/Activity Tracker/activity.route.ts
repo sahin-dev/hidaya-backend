@@ -1,41 +1,24 @@
 import { Router } from 'express';
 import { auth } from '../../middlewares';
 import { ActivityController } from './activity.controller';
-import { ROLE } from '../Auth/auth.constant';
 
 const router = Router();
 
 router
   .route('/')
-  .post(
-    auth(ROLE.USER, ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    ActivityController.createActivity
-  )
-  .get(
-    auth(ROLE.USER, ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    ActivityController.getActivitiesByUser
-  );
+  .post(auth(), ActivityController.createActivity)
+  .get(auth(), ActivityController.getActivitiesByUser)
+  .patch(auth(), ActivityController.updateActivity);
 
-router
-  .route('/today')
-  .get(
-    auth(ROLE.USER, ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    ActivityController.getActivitiesForToday
-  );
+router.route('/today').get(auth(), ActivityController.getActivitiesForToday);
+
+router.route('/by-date').get(auth(), ActivityController.getActivitiesByDate);
+
+router.route('/history').get(auth(), ActivityController.getAllActivityHistory);
 
 router
   .route('/:id')
-  .get(
-    auth(ROLE.USER, ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    ActivityController.getActivity
-  )
-  .patch(
-    auth(ROLE.USER, ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    ActivityController.updateActivity
-  )
-  .delete(
-    auth(ROLE.SUPER_ADMIN, ROLE.ADMIN),
-    ActivityController.deleteActivity
-  );
+  .get(auth(), ActivityController.getActivity)
+  .delete(auth(), ActivityController.deleteActivity);
 
 export const ActivityRoutes = router;

@@ -1,4 +1,6 @@
+import status from 'http-status';
 import QueryBuilder from '../../builders/QueryBuilder';
+import { AppError } from '../../utils';
 import Auth from '../Auth/auth.model'; // adjust path if needed
 import { subDays } from 'date-fns';
 
@@ -50,6 +52,9 @@ const fetchAdminStats = async () => {
 };
 
 const blockUser = async (userId: string, block: boolean) => {
+  if (typeof block !== 'boolean') {
+    throw new AppError(status.BAD_REQUEST, 'Block should be boolean');
+  }
   const user = await Auth.findById(userId);
   if (!user) {
     throw new Error('User not found');

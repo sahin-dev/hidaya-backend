@@ -7,14 +7,17 @@ interface ActivityUpdatePayload {
   water?: number;
   step?: number;
   calories?: number;
-  user: string; // user ID
+  user: string;
 }
 
 const createActivity = async (payload: Partial<IActivity>) => {
   const activity = await ActivityModel.create(payload);
 
   if (!activity) {
-    throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to create activity');
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Failed to create activity'
+    );
   }
 
   return activity;
@@ -34,9 +37,6 @@ const getActivitiesByUser = async (userId: string) => {
   return await ActivityModel.find({ user: userId });
 };
 
-/**
- * Get activities for today (user specific)
- */
 const getActivitiesForToday = async (userId: string) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -55,11 +55,28 @@ const getActivitiesForToday = async (userId: string) => {
   return activities;
 };
 
-const updateActivity = async (userId: string, payload: ActivityUpdatePayload) => {
-  let activity = await ActivityModel.findOne({ user: userId });
+const updateActivity = async (
+  userId: string,
+  payload: ActivityUpdatePayload
+) => {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+  let activity = await ActivityModel.findOne({
+    user: userId,
+    createdAt: { $gte: todayStart, $lt: tomorrowStart },
+  });
 
   if (!activity) {
-    activity = await ActivityModel.create({ user: userId, water: 0, step: 0, calories: 0 });
+    activity = await ActivityModel.create({
+      user: userId,
+      water: 0,
+      step: 0,
+      calories: 0,
+    });
   }
 
   if (typeof payload.water === 'number') {
@@ -89,6 +106,32 @@ const deleteActivity = async (id: string) => {
   return null;
 };
 
+const getActivitiesByDate = async (userId: string, dateStr: string) => {
+  if (!dateStr) {
+    throw new AppError(status.BAD_REQUEST, 'Date params is required');
+  }
+  // Parse dateStr "DD-MM-YYYY"
+  const [day, month, year] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+
+  const activities = await ActivityModel.find({
+    user: userId,
+    createdAt: { $gte: start, $lt: end },
+  });
+
+  return activities;
+};
+
+const getAllActivityHistory = async (userId: string) => {
+  return await ActivityModel.find({ user: userId }).sort({ createdAt: -1 });
+};
+
 export const ActivityService = {
   createActivity,
   getActivityById,
@@ -96,4 +139,6 @@ export const ActivityService = {
   getActivitiesForToday,
   updateActivity,
   deleteActivity,
+  getActivitiesByDate,
+  getAllActivityHistory,
 };
