@@ -37,7 +37,7 @@ const getHadithsForToday = async () => {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1); // start of tomorrow
 
-  const hadiths = await Hadith.find({
+  const hadiths = await Hadith.findOne({
     date: {
       $gte: today,
       $lt: tomorrow,

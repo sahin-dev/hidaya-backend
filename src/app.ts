@@ -20,11 +20,10 @@ const app: Application = express();
 app.use(
   cors({
     credentials: true,
-    origin: ['http://localhost:3000'],
+    origin: ['*'],
   })
 );
 app.use(cookieParser());
-
 
 // static files
 app.use('/public', express.static('public'));

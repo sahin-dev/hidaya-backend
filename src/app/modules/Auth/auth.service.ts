@@ -99,7 +99,11 @@ const resendOtpAgain = async (email: string) => {
 
 // For signin
 const signinIntoDB = async (payload: { email: string; password: string }) => {
-  const user = await Auth.findOne({ email: payload.email }).select('+password');
+  const user = await Auth.findOne({
+    email: payload.email,
+    isVerified: true,
+    isBlocked: false,
+  }).select('+password');
 
   if (!user) {
     throw new AppError(status.NOT_FOUND, 'User not exists!');
