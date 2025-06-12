@@ -5,6 +5,6 @@ export interface IActivity extends Document {
   water: number;
   step: number;
   calories: number;
-  createdAt: number;
-  updatedAt: number;
+  date: Date;
+  updatedAt: Date;
 }

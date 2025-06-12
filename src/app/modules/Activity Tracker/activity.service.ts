@@ -1,3 +1,4 @@
+import { IAuth } from './../Auth/auth.interface';
 import status from 'http-status';
 import { AppError } from '../../utils';
 import ActivityModel from './activity.model';
@@ -10,8 +11,29 @@ interface ActivityUpdatePayload {
   user: string;
 }
 
-const createActivity = async (payload: Partial<IActivity>) => {
-  const activity = await ActivityModel.create(payload);
+const createActivity = async (user: IAuth, payload: Partial<IActivity>) => {
+  const now = new Date();
+  const startOfDay = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  );
+
+  const activity = await ActivityModel.findOneAndUpdate(
+    {
+      user: user._id,
+      date: startOfDay,
+    },
+    {
+      ...payload,
+      date: startOfDay,
+      user: user._id,
+    },
+    {
+      new: true,
+      upsert: true,
+      runValidators: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 
   if (!activity) {
     throw new AppError(
@@ -23,36 +45,16 @@ const createActivity = async (payload: Partial<IActivity>) => {
   return activity;
 };
 
-const getActivityById = async (id: string) => {
-  const activity = await ActivityModel.findById(id);
+const getActivitiesForToday = async (user: IAuth) => {
+  const now = new Date();
+  const startOfDay = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  );
 
-  if (!activity) {
-    throw new AppError(status.NOT_FOUND, 'Activity not found');
-  }
-
-  return activity;
-};
-
-const getActivitiesByUser = async (userId: string) => {
-  return await ActivityModel.find({ user: userId });
-};
-
-const getActivitiesForToday = async (userId: string) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const activities = await ActivityModel.find({
-    user: userId,
-    createdAt: {
-      $gte: today,
-      $lt: tomorrow,
-    },
+  return await ActivityModel.findOne({
+    user: user._id,
+    date: startOfDay,
   });
-
-  return activities;
 };
 
 const updateActivity = async (
@@ -94,51 +96,13 @@ const updateActivity = async (
   return activity;
 };
 
-const deleteActivity = async (id: string) => {
-  const activity = await ActivityModel.findById(id);
-
-  if (!activity) {
-    throw new AppError(status.NOT_FOUND, 'Activity not found');
-  }
-
-  await ActivityModel.findByIdAndDelete(id);
-
-  return null;
-};
-
-const getActivitiesByDate = async (userId: string, dateStr: string) => {
-  if (!dateStr) {
-    throw new AppError(status.BAD_REQUEST, 'Date params is required');
-  }
-  // Parse dateStr "DD-MM-YYYY"
-  const [day, month, year] = dateStr.split('-').map(Number);
-  const date = new Date(year, month - 1, day);
-
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
-
-  const activities = await ActivityModel.find({
-    user: userId,
-    createdAt: { $gte: start, $lt: end },
-  });
-
-  return activities;
-};
-
-const getAllActivityHistory = async (userId: string) => {
-  return await ActivityModel.find({ user: userId }).sort({ createdAt: -1 });
+const getAllActivityHistory = async (user: IAuth) => {
+  return await ActivityModel.find({ user: user._id }).sort({ date: -1 });
 };
 
 export const ActivityService = {
   createActivity,
-  getActivityById,
-  getActivitiesByUser,
   getActivitiesForToday,
   updateActivity,
-  deleteActivity,
-  getActivitiesByDate,
   getAllActivityHistory,
 };
