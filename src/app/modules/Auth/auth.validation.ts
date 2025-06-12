@@ -23,19 +23,7 @@ const createSchema = z.object({
           required_error: 'Password is required',
         })
         .min(6, { message: 'Password must be at least 6 characters long' })
-        .max(20, { message: 'Password cannot exceed 20 characters' })
-        .regex(/[A-Z]/, {
-          message: 'Password must contain at least one uppercase letter',
-        })
-        .regex(/[a-z]/, {
-          message: 'Password must contain at least one lowercase letter',
-        })
-        .regex(/[0-9]/, {
-          message: 'Password must contain at least one number',
-        })
-        .regex(/[@$!%*?&#]/, {
-          message: 'Password must contain at least one special character',
-        }),
+        .max(20, { message: 'Password cannot exceed 20 characters' }),
     })
     .strict(),
 });
@@ -90,7 +78,8 @@ const updateSchema = z.object({
     .omit({ email: true, password: true })
     .partial()
     .extend({
-      address: z.string().optional(),
+      city: z.string().optional(),
+      country: z.string().optional(),
       phoneNumber: z.string().optional(),
     })
     .strict(),
@@ -119,19 +108,7 @@ const resetPasswordSchema = z.object({
         required_error: 'New password is required',
       })
       .min(6, { message: 'New password must be at least 6 characters long' })
-      .max(20, { message: 'New password cannot exceed 20 characters' })
-      .regex(/[A-Z]/, {
-        message: 'New password must contain at least one uppercase letter',
-      })
-      .regex(/[a-z]/, {
-        message: 'New password must contain at least one lowercase letter',
-      })
-      .regex(/[0-9]/, {
-        message: 'New password must contain at least one number',
-      })
-      .regex(/[@$!%*?&#]/, {
-        message: 'New password must contain at least one special character',
-      }),
+      .max(20, { message: 'New password cannot exceed 20 characters' }),
   }),
 });
 
@@ -147,17 +124,7 @@ const signinSchema = z.object({
         required_error: 'Password is required',
       })
       .min(6, { message: 'Password must be at least 6 characters long' })
-      .max(20, { message: 'Password cannot exceed 20 characters' })
-      .regex(/[A-Z]/, {
-        message: 'Password must contain at least one uppercase letter',
-      })
-      .regex(/[a-z]/, {
-        message: 'Password must contain at least one lowercase letter',
-      })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
-      .regex(/[@$!%*?&#]/, {
-        message: 'Password must contain at least one special character',
-      }),
+      .max(20, { message: 'Password cannot exceed 20 characters' }),
   }),
 });
 
@@ -168,37 +135,15 @@ const passwordChangeSchema = z.object({
         required_error: 'Old password is required',
       })
       .min(6, { message: 'Old password must be at least 6 characters long' })
-      .max(20, { message: 'Old password cannot exceed 20 characters' })
-      .regex(/[A-Z]/, {
-        message: 'Old password must contain at least one uppercase letter',
-      })
-      .regex(/[a-z]/, {
-        message: 'Old password must contain at least one lowercase letter',
-      })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
-      .regex(/[@$!%*?&#]/, {
-        message: 'Old password must contain at least one special character',
-      }),
+      .max(20, { message: 'Old password cannot exceed 20 characters' }),
     newPassword: z
       .string({
         required_error: 'New password is required',
       })
       .min(6, { message: 'New password must be at least 6 characters long' })
-      .max(20, { message: 'New password cannot exceed 20 characters' })
-      .regex(/[A-Z]/, {
-        message: 'New password must contain at least one uppercase letter',
-      })
-      .regex(/[a-z]/, {
-        message: 'New password must contain at least one lowercase letter',
-      })
-      .regex(/[0-9]/, { message: 'Password must contain at least one number' })
-      .regex(/[@$!%*?&#]/, {
-        message: 'New password must contain at least one special character',
-      }),
+      .max(20, { message: 'New password cannot exceed 20 characters' }),
   }),
 });
-
-
 
 const refreshTokenSchema = z.object({
   cookies: z.object({

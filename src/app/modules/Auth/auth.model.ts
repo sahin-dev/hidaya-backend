@@ -47,7 +47,11 @@ const authSchema = new mongoose.Schema<IAuth>(
       enum: Object.values(PROVIDER),
       default: null,
     },
-    address: {
+    city: {
+      type: String,
+      default: null,
+    },
+    country: {
       type: String,
       default: null,
     },

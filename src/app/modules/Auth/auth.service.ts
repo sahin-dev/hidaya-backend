@@ -233,7 +233,7 @@ const updateProfileIntoDB = async (
 
     return await Auth.findByIdAndUpdate(user._id, payload, {
       new: true,
-    }).select('fullName email image role address phoneNumber');
+    }).select('fullName email image role city country phoneNumber');
   } catch {
     if (file?.path) {
       try {
