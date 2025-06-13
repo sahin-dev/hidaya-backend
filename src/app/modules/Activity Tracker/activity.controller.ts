@@ -27,14 +27,10 @@ const getActivitiesForToday = asyncHandler(async (req, res) => {
 });
 
 const updateActivity = asyncHandler(async (req, res) => {
-  const userId = req.user._id as string;
-
-  const payload = req.body;
-
-  const updatedActivity = await ActivityService.updateActivity(userId, {
-    ...payload,
-    user: userId,
-  });
+  const updatedActivity = await ActivityService.updateActivity(
+    req.user,
+    req.body
+  );
 
   res
     .status(status.OK)
@@ -49,8 +45,11 @@ const updateActivity = asyncHandler(async (req, res) => {
 
 // New: Get all activity history for the user
 const getAllActivityHistory = asyncHandler(async (req, res) => {
-
-  const activities = await ActivityService.getAllActivityHistory(req.user);
+  const date = req.query.date as string | undefined;
+  const activities = await ActivityService.getAllActivityHistory(
+    req.user,
+    date
+  );
 
   res
     .status(status.OK)
