@@ -6,7 +6,7 @@ COPY package*.json .
 
 RUN yarn install --frozen-lockfile
 
-EXPOSE 5012
+EXPOSE 5050
 
 COPY . .
 

@@ -8,9 +8,16 @@ services:
     ports:
       - 5050:5050
     volumes:
-      - logs:/app/logs
-      - /app/node_modules # anonymous volume
       - ./:/app
+      - /app/node_modules
+      - logs:/app/logs
+
+    working_dir: /app
+
+    command: npm run dev
+
+    environment:
+      - CHOKIDAR_USEPOLLING=true
 
 volumes:
   logs:

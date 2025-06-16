@@ -57,12 +57,35 @@ const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
   );
 
+  const activity = await ActivityModel.findOne({
+    user: user._id,
+    date: startOfDay,
+  });
+
+  if (!activity) {
+    throw new AppError(status.NOT_FOUND, 'Activity not found');
+  }
+
+  const incFields: Partial<IActivity> = {};
+
+  if (payload?.water) {
+    incFields.water = Number(payload.water);
+  }
+
+  if (payload?.step) {
+    incFields.step = Number(payload.step);
+  }
+
+  if (payload?.calories) {
+    incFields.calories = Number(payload.calories);
+  }
+
   return await ActivityModel.findOneAndUpdate(
     {
       user: user._id,
       date: startOfDay,
     },
-    payload,
+    { $inc: incFields },
     { new: true, runValidators: true }
   );
 };
