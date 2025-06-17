@@ -2,12 +2,16 @@ import status from 'http-status';
 import { AppError } from '../../utils';
 import Journal from './journal.model';
 import { IJournal } from './journal.interface';
+import { FilterQuery } from 'mongoose';
 
 const createJournal = async (payload: IJournal) => {
   const journal = await Journal.create(payload);
 
   if (!journal) {
-    throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to create journal');
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Failed to create journal'
+    );
   }
 
   return journal;
@@ -23,29 +27,25 @@ const getJournalById = async (id: string) => {
   return journal;
 };
 
-const getAllJournals = async () => {
-  return await Journal.find();
+const getAllJournals = async (query: Record<string, unknown>) => {
+  const filterQuery: FilterQuery<IJournal> = {};
+
+  if (query?.date) {
+    const date = new Date(query.date as string);
+    date.setHours(0, 0, 0, 0); // start of today
+
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1); // start of tomorrow
+
+    filterQuery.createdAt = {
+      $gte: date,
+      $lte: nextDate,
+    };
+  }
+  return await Journal.find(filterQuery);
 };
 
-/**
- * Get journals created on today's date (ignoring time)
- */
-const getJournalsForToday = async () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // start of today
 
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1); // start of tomorrow
-
-  const journals = await Journal.find({
-    createdAt: {
-      $gte: today,
-      $lt: tomorrow,
-    },
-  });
-
-  return journals;
-};
 
 const updateJournal = async (id: string, payload: Partial<IJournal>) => {
   const journal = await Journal.findById(id);
@@ -59,7 +59,10 @@ const updateJournal = async (id: string, payload: Partial<IJournal>) => {
   });
 
   if (!updatedJournal) {
-    throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to update journal');
+    throw new AppError(
+      status.INTERNAL_SERVER_ERROR,
+      'Failed to update journal'
+    );
   }
 
   return updatedJournal;
@@ -81,7 +84,6 @@ export const JournalService = {
   createJournal,
   getJournalById,
   getAllJournals,
-  getJournalsForToday,
   updateJournal,
   deleteJournal,
 };

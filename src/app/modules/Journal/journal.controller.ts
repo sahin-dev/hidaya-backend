@@ -20,8 +20,8 @@ const getJournal = asyncHandler(async (req, res) => {
     .json(new AppResponse(status.OK, journal, 'Journal fetched successfully'));
 });
 
-const getAllJournals = asyncHandler(async (_req, res) => {
-  const journals = await JournalService.getAllJournals();
+const getAllJournals = asyncHandler(async (req, res) => {
+  const journals = await JournalService.getAllJournals(req.query);
 
   res
     .status(status.OK)
@@ -30,19 +30,7 @@ const getAllJournals = asyncHandler(async (_req, res) => {
     );
 });
 
-const getJournalsForToday = asyncHandler(async (_req, res) => {
-  const journals = await JournalService.getJournalsForToday();
 
-  res
-    .status(status.OK)
-    .json(
-      new AppResponse(
-        status.OK,
-        journals,
-        "Today's Journals fetched successfully"
-      )
-    );
-});
 
 const updateJournal = asyncHandler(async (req, res) => {
   const updatedJournal = await JournalService.updateJournal(
@@ -69,7 +57,6 @@ export const JournalController = {
   createJournal,
   getJournal,
   getAllJournals,
-  getJournalsForToday,
   updateJournal,
   deleteJournal,
 };

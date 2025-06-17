@@ -9,8 +9,6 @@ router
   .post(auth(), JournalController.createJournal)
   .get(JournalController.getAllJournals);
 
-router.route('/today').get(JournalController.getJournalsForToday);
-
 router
   .route('/:id')
   .get(JournalController.getJournal)
