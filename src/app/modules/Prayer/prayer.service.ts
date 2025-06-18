@@ -16,6 +16,8 @@ const getPrayerTimes = async (user: IAuth) => {
     },
   });
 
+
+
   const timings = response.data.data.timings;
 
   if (!timings) {
@@ -95,6 +97,7 @@ const fetchAllPrayerLogsFromDB = async (user: IAuth, date: string) => {
   const logs = await DailyPrayerLog.find(query);
   const allPrayers = await getPrayerTimes(user);
 
+
   const response = logs.map((item) => {
     const { prayers, ...remainData } = item.toObject();
 
@@ -106,20 +109,22 @@ const fetchAllPrayerLogsFromDB = async (user: IAuth, date: string) => {
         }
         return {
           ...item,
-          isCompleted: false,
+          isComplete: false,
         };
       }),
     };
   });
 
-  const customResponse = [{
-    auth: user._id,
-    date: new Date(date),
-    prayers: allPrayers?.map((item) => ({
-      ...item,
-      isCompleted: false,
-    })),
-  }];
+  const customResponse = [
+    {
+      auth: user._id,
+      date: new Date(date),
+      prayers: allPrayers?.map((item) => ({
+        ...item,
+        isComplete: false,
+      })),
+    },
+  ];
 
   return response?.length ? response : customResponse;
 };

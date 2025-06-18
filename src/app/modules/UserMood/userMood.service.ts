@@ -5,13 +5,18 @@ import { IUserMood } from './userMood.interface';
 
 const saveUserMoodIntoDB = async (user: IAuth, trackerId: string) => {
   const today = new Date();
+  today.setDate(today.getDate() + 1);
   today.setHours(0, 0, 0, 0);
 
-  return await UserMood.create({
-    user: user._id,
-    mood: trackerId,
-    date: today,
-  });
+  return await UserMood.findOneAndUpdate(
+    { auth: user._id, date: today },
+    {
+      auth: user._id,
+      mood: trackerId,
+      date: today,
+    },
+    { upsert: true, setDefaultsOnInsert: true, runValidators: true, new: true }
+  );
 };
 
 const getAllUserMoodList = async (
@@ -19,6 +24,12 @@ const getAllUserMoodList = async (
   query: Record<string, unknown>
 ) => {
   const mongoQuery: FilterQuery<IUserMood> = { auth: user._id };
+
+  if (query?.date) {
+    const date = new Date(query.date as string);
+    date.setHours(0, 0, 0, 0);
+    mongoQuery.date = date;
+  }
 
   return await UserMood.find(mongoQuery);
 };

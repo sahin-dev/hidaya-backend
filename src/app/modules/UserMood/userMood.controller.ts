@@ -3,7 +3,11 @@ import { AppResponse, asyncHandler } from '../../utils';
 import { UserMoodService } from './userMood.service';
 
 const saveMood = asyncHandler(async (req, res) => {
-  const result = await UserMoodService.saveUserMoodIntoDB(req.user, req.body);
+  
+  const result = await UserMoodService.saveUserMoodIntoDB(
+    req.user,
+    req.body.trackerId
+  );
 
   res
     .status(status.CREATED)
