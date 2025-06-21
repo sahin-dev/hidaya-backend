@@ -62,9 +62,27 @@ const getAllActivityHistory = asyncHandler(async (req, res) => {
     );
 });
 
+const getActivityHistoryByDateRange = asyncHandler(async (req, res) => {
+  const activities = await ActivityService.getActivityHistoryByDateRange(
+    req.user,
+    req.query
+  );
+
+  res
+    .status(status.OK)
+    .json(
+      new AppResponse(
+        status.OK,
+        activities,
+        'All activity history fetched successfully'
+      )
+    );
+});
+
 export const ActivityController = {
   createActivity,
   getActivitiesForToday,
   updateActivity,
   getAllActivityHistory,
+  getActivityHistoryByDateRange,
 };

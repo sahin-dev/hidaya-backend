@@ -16,7 +16,10 @@ const saveUserMoodIntoDB = async (user: IAuth, trackerId: string) => {
       date: today,
     },
     { upsert: true, setDefaultsOnInsert: true, runValidators: true, new: true }
-  );
+  ).populate({
+    path: 'mood',
+    populate: 'category',
+  });
 };
 
 const getAllUserMoodList = async (
@@ -31,7 +34,10 @@ const getAllUserMoodList = async (
     mongoQuery.date = date;
   }
 
-  return await UserMood.find(mongoQuery);
+  return await UserMood.find(mongoQuery).populate({
+    path: 'mood',
+    populate: 'category',
+  });
 };
 
 export const UserMoodService = {

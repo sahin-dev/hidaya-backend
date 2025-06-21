@@ -74,6 +74,7 @@ const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
 
   if (payload?.step) {
     incFields.step = Number(payload.step);
+    incFields.calories = Number(payload.calories);
   }
 
   if (payload?.calories) {
@@ -102,9 +103,71 @@ const getAllActivityHistory = async (user: IAuth, date?: string) => {
   return await ActivityModel.find(query).sort({ date: -1 });
 };
 
+const getActivityHistoryByDateRange = async (
+  user: IAuth,
+  query: Record<string, unknown>
+) => {
+  if (!query?.from || !query?.end) {
+    throw new AppError(status.BAD_REQUEST, 'From and End date are required');
+  }
+
+  const from = new Date(query.from as string);
+  const end = new Date(query.end as string);
+
+  if (isNaN(from.getTime()) || isNaN(end.getTime())) {
+    throw new AppError(status.BAD_REQUEST, 'Invalid date format');
+  }
+
+  const fromDate = new Date(
+    Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate())
+  );
+  const endDate = new Date(
+    Date.UTC(
+      end.getUTCFullYear(),
+      end.getUTCMonth(),
+      end.getUTCDate(),
+      23,
+      59,
+      59
+    )
+  );
+
+  // MongoDB filter query
+  const mongoQuery: FilterQuery<IActivity> = {
+    user: user._id,
+    date: {
+      $gte: fromDate,
+      $lte: endDate,
+    },
+  };
+
+  // Perform aggregation to group by date and sum values
+  const activities = await ActivityModel.aggregate([
+    {
+      $match: mongoQuery,
+    },
+    {
+      $group: {
+        _id: {
+          $dateToString: { format: '%Y-%m-%d', date: '$date' },
+        },
+        totalSteps: { $sum: '$step' },
+        totalWater: { $sum: '$water' },
+        totalCalories: { $sum: '$calories' },
+      },
+    },
+    {
+      $sort: { _id: 1 },
+    },
+  ]);
+
+  return activities;
+};
+
 export const ActivityService = {
   createActivity,
   getActivitiesForToday,
   updateActivity,
   getAllActivityHistory,
+  getActivityHistoryByDateRange,
 };

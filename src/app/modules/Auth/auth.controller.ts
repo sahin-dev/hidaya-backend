@@ -84,8 +84,7 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
 });
 
 const changePassword = asyncHandler(async (req, res) => {
-  const accessToken = req.cookies.accessToken;
-  const result = await AuthService.changePasswordIntoDB(accessToken, req.body);
+  const result = await AuthService.changePasswordIntoDB(req.user, req.body);
 
   res
     .status(status.OK)

@@ -272,15 +272,12 @@ const updateProfilePhoto = async (
 };
 
 const changePasswordIntoDB = async (
-  accessToken: string,
+  existingUser: IAuth,
   payload: z.infer<typeof AuthValidation.passwordChangeSchema.shape.body>
 ) => {
-  const { id } = await verifyToken(accessToken);
-
   const user = await Auth.findOne({
-    _id: id,
+    _id: existingUser._id,
     isVerified: true,
-    isBlocked: false,
   }).select('+password');
 
   if (!user) {

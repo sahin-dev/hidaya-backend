@@ -13,4 +13,8 @@ router.route('/today').get(auth(), ActivityController.getActivitiesForToday);
 
 router.route('/history').get(auth(), ActivityController.getAllActivityHistory);
 
+router
+  .route('/history-by-date')
+  .get(auth(), ActivityController.getActivityHistoryByDateRange);
+
 export const ActivityRoutes = router;
