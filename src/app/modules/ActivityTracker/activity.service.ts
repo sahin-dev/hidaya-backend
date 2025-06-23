@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IAuth } from './../Auth/auth.interface';
 import status from 'http-status';
 import { AppError } from '../../utils';
@@ -11,13 +12,15 @@ const createActivity = async (user: IAuth, payload: Partial<IActivity>) => {
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
   );
 
+  const data = { ...payload, calories: Number(payload.step) * 0.04 };
+
   const activity = await ActivityModel.findOneAndUpdate(
     {
       user: user._id,
       date: startOfDay,
     },
     {
-      ...payload,
+      ...data,
       date: startOfDay,
       user: user._id,
     },
@@ -74,7 +77,7 @@ const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
 
   if (payload?.step) {
     incFields.step = Number(payload.step);
-    incFields.calories = Number(payload.calories);
+    incFields.calories = Number(payload.step) * 0.04;
   }
 
   if (payload?.calories) {
@@ -154,6 +157,7 @@ const getActivityHistoryByDateRange = async (
         totalSteps: { $sum: '$step' },
         totalWater: { $sum: '$water' },
         totalCalories: { $sum: '$calories' },
+        activities: { $push: '$$ROOT' }, // Push the entire activity document for later use
       },
     },
     {
@@ -161,7 +165,39 @@ const getActivityHistoryByDateRange = async (
     },
   ]);
 
-  return activities;
+  // Create the response structure
+  const result = {
+    user: user._id,
+    calculation: {
+      totalStep: activities.reduce((acc, curr) => acc + curr.totalSteps, 0),
+      totalWater: activities.reduce((acc, curr) => acc + curr.totalWater, 0),
+      totalCalories: activities.reduce(
+        (acc, curr) => acc + curr.totalCalories,
+        0
+      ),
+    },
+    history: activities
+      .map((activity) => {
+        return activity.activities.map((act: any) => {
+          // Get the day name from the date
+          const dayName = new Intl.DateTimeFormat('en-US', {
+            weekday: 'short',
+          }).format(new Date(act.date));
+
+          return {
+            _id: act._id,
+            date: act.date,
+            day: dayName,
+            calories: act.calories,
+            step: act.step,
+            water: act.water,
+          };
+        });
+      })
+      .flat(),
+  };
+
+  return result;
 };
 
 export const ActivityService = {
