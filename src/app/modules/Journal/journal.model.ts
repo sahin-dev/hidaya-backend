@@ -3,26 +3,17 @@ import { IJournal } from './journal.interface';
 
 const journalSchema = new Schema<IJournal>(
   {
-    title: {
+    reflection: {
       type: String,
-      required: true,
-      trim: true,
+      required: [true, 'Reflection is required'],
     },
-    content: {
+    goals: {
       type: String,
       required: [true, 'Content is required'],
     },
-    water: {
-      type: Number,
-      required: false,
-    },
-    steps: {
-      type: Number,
-      required: false,
-    },
-    calories: {
-      type: Number,
-      required: false,
+    challenges: {
+      type: String,
+      required: [true, 'Challenges is required'],
     },
   },
   {

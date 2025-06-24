@@ -1,11 +1,9 @@
 import { Document } from 'mongoose';
 
 export interface IJournal extends Document {
-  title: string;
-  content: string;
-  water: number;
-  steps: number;
-  calories: number;
+  reflection: string;
+  goals: string;
+  challenges: string;
   createdAt: Date;
   updatedAt: string;
 }

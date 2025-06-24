@@ -1,18 +1,27 @@
 import { Router } from 'express';
-import { auth } from '../../middlewares';
+import { auth, validateRequest } from '../../middlewares';
 import { JournalController } from './journal.controller';
+import { JournalValidation } from './journal.validation';
 
 const router = Router();
 
 router
   .route('/')
-  .post(auth(), JournalController.createJournal)
+  .post(
+    auth(),
+    validateRequest(JournalValidation.createSchema),
+    JournalController.createJournal
+  )
   .get(JournalController.getAllJournals);
 
 router
   .route('/:id')
   .get(JournalController.getJournal)
-  .patch(auth(), JournalController.updateJournal)
+  .patch(
+    auth(),
+    validateRequest(JournalValidation.updateSchema),
+    JournalController.updateJournal
+  )
   .delete(auth(), JournalController.deleteJournal);
 
 export const JournalRoutes = router;
