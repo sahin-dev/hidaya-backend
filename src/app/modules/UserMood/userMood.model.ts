@@ -7,9 +7,12 @@ const UserMoodSchema = new mongoose.Schema<IUserMood>({
     ref: 'Auth',
     required: true,
   },
-  mood: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tracker',
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
     required: true,
   },
   date: {
