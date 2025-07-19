@@ -23,12 +23,17 @@ const authSchema = new mongoose.Schema<IAuth>(
         'Please provide a valid email',
       ],
     },
+    token:{
+      type:String,
+      default:null
+    },
     password: {
       type: String,
       required: false,
       minlength: [6, 'Password must be at least 6 characters'],
       select: false,
     },
+   
     image: {
       type: String,
       default: null,

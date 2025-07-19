@@ -4,6 +4,7 @@ import { TProvider, TRole } from './auth.constant';
 export interface IAuth extends Document {
   fullName: string;
   email: string;
+  token:string
   password: string;
   role: TRole;
   image?: string;

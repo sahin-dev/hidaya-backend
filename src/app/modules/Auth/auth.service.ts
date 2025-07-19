@@ -98,7 +98,7 @@ const resendOtpAgain = async (email: string) => {
 };
 
 // For signin
-const signinIntoDB = async (payload: { email: string; password: string }) => {
+const signinIntoDB = async (payload: { email: string; password: string,token:string }) => {
   const user = await Auth.findOne({
     email: payload.email,
     isVerified: true,
@@ -129,6 +129,7 @@ const signinIntoDB = async (payload: { email: string; password: string }) => {
   const refreshToken = user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
+  user.token = payload.token
   await user.save();
 
   return {
