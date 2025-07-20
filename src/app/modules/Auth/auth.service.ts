@@ -26,6 +26,7 @@ const saveUserIntoDB = async (payload: IAuth) => {
 
   payload.otp = otp;
   payload.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+  console.log(payload)
 
   await Auth.create(payload);
 

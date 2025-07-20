@@ -40,6 +40,7 @@ process.on('unhandledRejection', (error) => {
 
 async function bootstrap() {
   try {
+    console.log(config.db_url)
     await mongoose.connect(config.db_url as string);
     console.log('🛢 Database connected successfully');
     await seedingAdmin();
