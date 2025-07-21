@@ -2,6 +2,8 @@ import admin from 'firebase-admin';
 import { serviceAccount } from './firebaseService';
 
 try {
+
+
   admin.initializeApp({
     credential: admin.credential.cert({
       projectId: serviceAccount.project_id,

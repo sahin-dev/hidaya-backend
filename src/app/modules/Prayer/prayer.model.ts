@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import { IDailyPrayerLog } from './prayer.interface';
 import { PRAYER_NAMES } from './prayer.constant';
 
+
 const prayerSchema = new Schema(
   {
     name: {
@@ -20,6 +21,7 @@ const prayerSchema = new Schema(
   },
   { _id: false, versionKey: false }
 );
+
 
 const dailyPrayerLogSchema = new Schema<IDailyPrayerLog>(
   {
@@ -40,6 +42,7 @@ const dailyPrayerLogSchema = new Schema<IDailyPrayerLog>(
     timestamps: true,
   }
 );
+
 
 // Create a compound index to ensure a user has only one log per day
 dailyPrayerLogSchema.index({ userId: 1, date: 1 }, { unique: true });

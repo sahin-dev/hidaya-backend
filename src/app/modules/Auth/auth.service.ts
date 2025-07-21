@@ -12,6 +12,7 @@ import bcrypt from 'bcryptjs';
 import { TSocialLoginPayload } from '../../types';
 import fs from 'fs';
 import { z } from 'zod';
+import { ROLE } from './auth.constant';
 
 // Create a new account
 const saveUserIntoDB = async (payload: IAuth) => {
@@ -402,6 +403,12 @@ const getProfileFromDB = async (user: IAuth) => {
   return auth;
 };
 
+ const getAllUsers = async ()=>{
+  const users = await Auth.find({role:ROLE.USER})
+
+  return users
+}
+
 export const AuthService = {
   saveUserIntoDB,
   verifyOtpIntoDB,
@@ -416,4 +423,5 @@ export const AuthService = {
   verifyOtpForForgetPassword,
   resetPasswordIntoDB,
   getProfileFromDB,
+  getAllUsers
 };

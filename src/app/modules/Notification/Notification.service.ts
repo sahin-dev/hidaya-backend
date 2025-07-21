@@ -2,24 +2,22 @@ import ApiError from "../../utils/AppError";
 import Auth from "../Auth/auth.model";
 import admin from "./firebaseAdmin";
 import httpStatus from "http-status";
-import { Request } from "express";
 import Notification from "./notification.model";
 
 // Send notification to a single user
-export const sendSingleNotification = async (req: Request) => {
+export const sendSingleNotification = async (token: string, notificationBody:{title:string, body:string}) => {
   try {
-    const { userId } = req.params;
+
   
-    const { title, body } = req.body;
-    const myId = req.user.id
+    const { title, body } = notificationBody;
 
     if (!title || !body) {
       throw new ApiError(400, "Title and body are required");
     }
 
-    const user = await Auth.findById(userId);
+    const user = await Auth.find({token})
 
-    if (!user || !user.token) {
+    if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, "User firebase client token is invalid") 
     }
 
@@ -28,14 +26,20 @@ export const sendSingleNotification = async (req: Request) => {
         title,
         body,
       },
-      token: user.token,
+      token:token || "1111",
     };
 
+    try{
+      const response = await admin.messaging().send(message);
+      console.log(response)
+      return response;
+    }catch(err){
+      throw err
+    }
 
-    await Notification.create({title,body,receiver:userId,sender:myId})
 
-    const response = await admin.messaging().send(message);
-    return response;
+   
+
   } catch (error: any) {
     console.error("Error sending notification:", error);
     if (error.code === "messaging/invalid-registration-token") {

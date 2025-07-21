@@ -19,6 +19,7 @@ const getPrayerTimes = async (user: IAuth) => {
 
 
   const timings = response.data.data.timings;
+  const zone = response.data.data.meta.timezone
 
   if (!timings) {
     throw new Error('Could not retrieve prayer timings from the external API.');
@@ -27,6 +28,7 @@ const getPrayerTimes = async (user: IAuth) => {
   return Object.values(PRAYER_NAMES).map((item) => ({
     name: item,
     time: timings[item],
+    zone
   }));
 };
 

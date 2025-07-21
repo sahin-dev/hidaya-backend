@@ -15,6 +15,7 @@ import app from './app';
 import config from './app/config';
 import seedingAdmin from './app/utils/seeding';
 import { Logger } from './app/utils';
+import './app/modules/Agenda';
 
 
 let server: Server;
