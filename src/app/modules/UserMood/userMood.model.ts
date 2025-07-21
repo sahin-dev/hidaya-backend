@@ -19,7 +19,7 @@ const UserMoodSchema = new mongoose.Schema<IUserMood>({
     type: Date,
     required: true,
   },
-});
+},{timestamps:true});
 
 const UserMood = mongoose.model<IUserMood>('UserMood', UserMoodSchema);
 
