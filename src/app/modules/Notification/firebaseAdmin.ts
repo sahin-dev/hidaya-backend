@@ -1,15 +1,11 @@
-import admin from 'firebase-admin';
-import { serviceAccount } from './firebaseService';
+import admin, { ServiceAccount } from 'firebase-admin';
+import service from './serviceAccount.json'
 
 try {
 
 
   admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: serviceAccount.project_id,
-      clientEmail: serviceAccount.client_email,
-      privateKey: serviceAccount.private_key,
-    }),
+    credential: admin.credential.cert(service as ServiceAccount),
   });
 
   console.log('Firebase Admin SDK initialized successfully!');

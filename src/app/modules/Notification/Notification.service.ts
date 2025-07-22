@@ -26,22 +26,17 @@ export const sendSingleNotification = async (token: string, notificationBody:{ti
         title,
         body,
       },
-      token:token || "1111",
+      token:token,
     };
 
-    try{
-      const response = await admin.messaging().send(message);
-      console.log(response)
-      return response;
-    }catch(err){
-      throw err
-    }
-
-
+    console.log(message)
+    const response = await admin.messaging().send(message);
+    console.log(response)
    
 
   } catch (error: any) {
-    console.error("Error sending notification:", error);
+    console.error("Error sending notification:");
+    
     if (error.code === "messaging/invalid-registration-token") {
       throw new ApiError(400, "Invalid FCM registration token");
     } else if (error.code === "messaging/registration-token-not-registered") {

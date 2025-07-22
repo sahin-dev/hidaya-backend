@@ -5,17 +5,17 @@ import { sendSingleNotification, handleSendNotifications } from "./Notification.
 import httpStatus from 'http-status'
 
 
-const sendNotification = catchAsync(async (req: Request, res: Response) => {
-  const notification = await sendSingleNotification(req);
+// const sendNotification = catchAsync(async (req: Request, res: Response) => {
+//   // const notification = await sendSingleNotification(req);
 
- res.status(httpStatus.CREATED).json(new sendResponse(httpStatus.CREATED,notification,`Notification sent successfully`))
-});
+// //  res.status(httpStatus.CREATED).json(new sendResponse(httpStatus.CREATED,notification,`Notification sent successfully`))
+// });
 
-const sendNotifications = catchAsync(async (req: Request, res: Response) => {
-  const notifications = await handleSendNotifications(req);
+// const sendNotifications = catchAsync(async (req: Request, res: Response) => {
+//   const notifications = await handleSendNotifications(req);
 
-  res.status(httpStatus.CREATED).json(new sendResponse(httpStatus.CREATED,notifications,"Notification sent to all user successfully"))
-});
+//   res.status(httpStatus.CREATED).json(new sendResponse(httpStatus.CREATED,notifications,"Notification sent to all user successfully"))
+// });
 
 // const getNotifications = catchAsync(async (req: Request, res: Response) => {
 //   const notifications = await notificationServices.getNotificationsFromDB(req);
@@ -57,7 +57,7 @@ const sendNotifications = catchAsync(async (req: Request, res: Response) => {
 //   });
 // })
 
-export const notificationController = {
-  sendNotification,
-  sendNotifications,
-};
+// export const notificationController = {
+//   sendNotification,
+//   sendNotifications,
+// };
