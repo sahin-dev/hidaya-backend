@@ -6,7 +6,7 @@ import { PolicyController } from './policy.controller';
 const router = Router();
 
 router
-  .route('/')
+  .route('/create-or-update')
   .put(
     auth('SUPER_ADMIN'),
     validateRequest(PolicyValidation.cteateSchema),

@@ -13,6 +13,7 @@ import { TSocialLoginPayload } from '../../types';
 import fs from 'fs';
 import { z } from 'zod';
 import { ROLE } from './auth.constant';
+import path from 'path';
 
 // Create a new account
 const saveUserIntoDB = async (payload: IAuth) => {
@@ -222,6 +223,9 @@ const updateProfileIntoDB = async (
       throw new AppError(status.NOT_FOUND, 'User not exists!');
     }
 
+
+    
+
     if (file?.path) {
       if (user?.image) {
         try {
@@ -230,8 +234,10 @@ const updateProfileIntoDB = async (
           Logger.error('Error deleting old file:', error);
         }
       }
+      let resolvedPath = file.path.replace(/\\/g, "/")
+      let url = `http://${config.backend_url}/${resolvedPath}`
 
-      payload.image = file.path;
+      payload.image = url
     }
 
     return await Auth.findByIdAndUpdate(user._id, payload, {
@@ -264,7 +270,7 @@ const updateProfilePhoto = async (
       Logger.error('Error deleting old file:', error);
     }
   }
-
+  console.log(file)
   const res = await Auth.findByIdAndUpdate(
     user._id,
     { image: file.path },

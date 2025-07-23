@@ -6,7 +6,7 @@ import { TermsController } from './terms.controller';
 const router = Router();
 
 router
-  .route('/')
+  .route('/create-or-update')
   .put(
     auth('SUPER_ADMIN'),
     validateRequest(TermsValidation.cteateSchema),

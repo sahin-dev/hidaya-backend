@@ -5,6 +5,7 @@ import status from 'http-status';
 import { AppError, Logger } from '../../utils';
 import Category from './category.model';
 import { ICategory } from './category.interface';
+import config from '../../config';
 
 const createCategory = async (
   payload: ICategory,
@@ -19,8 +20,11 @@ const createCategory = async (
   if (existingCategory) {
     throw new AppError(status.BAD_REQUEST, 'Category already exists');
   }
+  let resolvedPath = file.path.replace(/\\/g, "/")
+  console.log(resolvedPath)
+  let url = `http://${config.backend_url}/${resolvedPath}`
 
-  payload.image = file.path;
+  payload.image = url;
 
   const category = await Category.create(payload);
 
@@ -58,6 +62,7 @@ const updateCategory = async (
   if (!category) {
     throw new AppError(status.NOT_FOUND, 'Category not found');
   }
+  payload.name = category.name
 
   if (file?.path) {
     if (category.image) {
@@ -67,7 +72,9 @@ const updateCategory = async (
         Logger.error('Error deleting old image:', error);
       }
     }
-    payload.image = file.path;
+    let resolvedPath = file.path.replace(/\\/g, "/")
+    let url = `http://${config.backend_url}/${resolvedPath}`
+    payload.image = url;
   }
 
   const updatedCategory = await Category.findByIdAndUpdate(id, payload, {
