@@ -12,6 +12,7 @@ router
     validateRequest(TermsValidation.cteateSchema),
     TermsController.saveTerms
   )
-  .get(TermsController.getTerms);
+  
+  router.route("/").get(TermsController.getTerms);
 
 export const TermsRoutes = router;

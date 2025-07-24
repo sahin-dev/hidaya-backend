@@ -12,6 +12,7 @@ router
     validateRequest(PolicyValidation.cteateSchema),
     PolicyController.savePolicy
   )
-  .get(PolicyController.getPolicy);
+  
+  router.route("/").get(PolicyController.getPolicy);
 
 export const PolicyRoutes = router;
