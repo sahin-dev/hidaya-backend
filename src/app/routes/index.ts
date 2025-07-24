@@ -10,6 +10,7 @@ import { JournalRoutes } from '../modules/Journal/journal.routes';
 import { ActivityRoutes } from '../modules/ActivityTracker/activity.route';
 import { PrayerLogRoutes } from '../modules/Prayer/prayer.route';
 import { UserMoodRoutes } from '../modules/UserMood/userMood.route';
+import { dashbaordRoutes } from '../modules/Dashboard/dashboard.route';
 
 
 const router = Router();
@@ -58,6 +59,10 @@ const moduleRoutes = [
   {
     path: '/user-moods',
     route: UserMoodRoutes,
+  },
+  {
+    path:"/dashboard",
+    route:dashbaordRoutes
   }
 ];
 

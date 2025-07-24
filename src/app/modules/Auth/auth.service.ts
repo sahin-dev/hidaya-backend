@@ -415,6 +415,60 @@ const getProfileFromDB = async (user: IAuth) => {
   return users
 }
 
+const getUsersMonthData = async ()=>{
+
+  const users = Auth.find({
+    $group:{
+      _id:{
+        $dateToString:{format:"%Y-%m", date:"$createdAt"}
+      },
+      users:{$push:"$$ROOT"},
+      count:{$sum:1}
+    }
+  },
+{
+  $sort:{_id:1}
+})
+
+return users
+}
+
+const getUsersGroupedByCreationMonth = async () => {
+  try {
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(`${currentYear}-01-01T00:00:00.000Z`);
+    const endOfYear = new Date(`${currentYear + 1}-01-01T00:00:00.000Z`);
+
+    const result = await Auth.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: startOfYear,
+            $lt: endOfYear
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%m", date: "$createdAt" }
+          },
+          users: { $push: "$$ROOT" },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    console.log(result);
+    return result;
+  } catch (err) {
+    console.error("Aggregation error:", err);
+  }
+};
+
 export const AuthService = {
   saveUserIntoDB,
   verifyOtpIntoDB,
@@ -429,5 +483,6 @@ export const AuthService = {
   verifyOtpForForgetPassword,
   resetPasswordIntoDB,
   getProfileFromDB,
-  getAllUsers
+  getAllUsers,
+  getUsersGroupedByCreationMonth
 };
