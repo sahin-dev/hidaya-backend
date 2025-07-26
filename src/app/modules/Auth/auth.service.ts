@@ -235,7 +235,7 @@ const updateProfileIntoDB = async (
         }
       }
       let resolvedPath = file.path.replace(/\\/g, "/")
-      let url = `http://${config.backend_url}/${resolvedPath}`
+      let url = `${config.backend_url}/${resolvedPath}`
 
       payload.image = url
     }

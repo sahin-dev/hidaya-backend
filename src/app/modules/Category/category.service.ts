@@ -22,7 +22,7 @@ const createCategory = async (
   }
   let resolvedPath = file.path.replace(/\\/g, "/")
   console.log(resolvedPath)
-  let url = `http://${config.backend_url}/${resolvedPath}`
+  let url = `${config.backend_url}/${resolvedPath}`
 
   payload.image = url;
 
@@ -73,7 +73,7 @@ const updateCategory = async (
       }
     }
     let resolvedPath = file.path.replace(/\\/g, "/")
-    let url = `http://${config.backend_url}/${resolvedPath}`
+    let url = `${config.backend_url}/${resolvedPath}`
     payload.image = url;
   }
 
