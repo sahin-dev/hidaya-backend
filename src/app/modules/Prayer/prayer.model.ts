@@ -45,7 +45,7 @@ const dailyPrayerLogSchema = new Schema<IDailyPrayerLog>(
 
 
 // Create a compound index to ensure a user has only one log per day
-dailyPrayerLogSchema.index({ userId: 1, date: 1 }, { unique: true });
+//  dailyPrayerLogSchema.index({ userId: 1, date: 1 }, { unique: true });
 
 export const DailyPrayerLog = model<IDailyPrayerLog>(
   'DailyPrayerLog',
