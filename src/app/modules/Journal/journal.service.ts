@@ -5,6 +5,7 @@ import { IJournal } from './journal.interface';
 import { FilterQuery } from 'mongoose';
 
 const createJournal = async (payload: IJournal) => {
+  console.log(payload)
   const journal = await Journal.create(payload);
 
   if (!journal) {
