@@ -3,6 +3,7 @@ import { AppResponse, asyncHandler } from '../../utils';
 import { PrayerService } from './prayer.service';
 
 const updatePrayer = asyncHandler(async (req, res) => {
+  console.log(req.body)
   const result = await PrayerService.updatePrayerIntoDB(req.user, req.body);
 
   res

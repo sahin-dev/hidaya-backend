@@ -28,7 +28,6 @@ const getPrayerTimes = async (user: IAuth) => {
   return Object.values(PRAYER_NAMES).map((item) => ({
     name: item,
     time: timings[item],
-    zone
   }));
 };
 
