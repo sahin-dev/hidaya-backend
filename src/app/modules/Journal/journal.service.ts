@@ -43,7 +43,7 @@ const getAllJournals = async (query: Record<string, unknown>) => {
       $lte: nextDate,
     };
   }
-  return await Journal.find(filterQuery);
+  return await Journal.find(filterQuery).sort({'createdAt':-1}).limit(1);
 };
 
 
