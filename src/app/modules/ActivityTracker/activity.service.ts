@@ -208,15 +208,28 @@ const getActivityHistoryByDateRange = async (
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
+ 
     // Find the previous Friday (assuming today is in the same week)
     const dayOfWeek = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const daysToSubtract = (dayOfWeek + 2) % 7; // Calculate how many days back to Friday
+  
+    const daysToSubtract = 7 - dayOfWeek; // Calculate how many days back to Friday
     const friday = new Date(today);
-    friday.setUTCDate(today.getUTCDate() - daysToSubtract);
+    friday.setUTCDate(today.getUTCDate() - dayOfWeek);
+    console.log(friday)
 
-    endDate = new Date(friday); // Friday
-    fromDate = new Date(friday);
-    fromDate.setUTCDate(friday.getUTCDate() - 6); // 6 days before Friday (last week's Friday)
+    fromDate = new Date(friday); // Friday
+    endDate = new Date(friday);
+    endDate.setUTCDate(friday.getUTCDate() + 7); // 6 days before Friday (last week's Friday)
+    console.log('fromDate:', fromDate)
+    console.log("enddate: ", endDate)
+    // let startDate = Date.now()
+    // let currentMin = new Date().getMinutes()
+    // let currentHour = new Date().getHours()
+    // console.log(dayOfWeek)
+    // let startDayOfCurrentWeek = new Date(Date.now() - ((currentMin*60)+(currentHour * 60 * 60) + (dayOfWeek * 12 * 60 * 60))* 1000)
+    // let endDayOfCurrentWeek = new Date(Date.now() + ( ((7-dayOfWeek) * 12 * 60 * 60)* 1000))
+    // console.log(startDayOfCurrentWeek)
+    // console.log(endDayOfCurrentWeek)
   } else {
     // Ensure from and end are provided
     if (!query?.from || !query?.end) {
