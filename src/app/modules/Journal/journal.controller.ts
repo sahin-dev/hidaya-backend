@@ -1,9 +1,12 @@
 import status from 'http-status';
 import { AppResponse, asyncHandler } from '../../utils';
 import { JournalService } from './journal.service';
+import { Types } from 'mongoose';
 
 const createJournal = asyncHandler(async (req, res) => {
-  const journal = await JournalService.createJournal(req.body);
+  const id = req.user._id
+
+  const journal = await JournalService.createJournal(id as Types.ObjectId,req.body);
 
   res
     .status(status.CREATED)

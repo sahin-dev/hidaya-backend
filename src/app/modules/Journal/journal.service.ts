@@ -2,10 +2,11 @@ import status from 'http-status';
 import { AppError } from '../../utils';
 import Journal from './journal.model';
 import { IJournal } from './journal.interface';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 
-const createJournal = async (payload: IJournal) => {
-  console.log(payload)
+const createJournal = async (id:Types.ObjectId,payload: IJournal) => {
+
+  payload.user = id
   const journal = await Journal.create(payload);
 
   if (!journal) {

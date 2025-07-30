@@ -1,8 +1,13 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 import { IJournal } from './journal.interface';
 
 const journalSchema = new Schema<IJournal>(
   {
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Auth',
+        required: true,
+      },
     reflection: {
       type: String,
       required: [true, 'Reflection is required'],
