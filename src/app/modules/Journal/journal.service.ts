@@ -6,8 +6,12 @@ import { FilterQuery, Types } from 'mongoose';
 
 const createJournal = async (id:Types.ObjectId,payload: IJournal) => {
 
-  payload.user = id
-  const journal = await Journal.create(payload);
+  
+  let journal = await Journal.findOneAndUpdate({user:id},payload);
+  if (!journal){
+    payload.user = id
+    journal = await Journal.create(payload)
+  }
 
   if (!journal) {
     throw new AppError(
