@@ -12,7 +12,7 @@ router
     validateRequest(JournalValidation.createSchema),
     JournalController.createJournal
   )
-  .get(JournalController.getAllJournals);
+  .get(auth(),JournalController.getAllJournals);
 
 router
   .route('/:id')
