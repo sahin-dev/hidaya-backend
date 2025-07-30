@@ -24,7 +24,8 @@ const getJournal = asyncHandler(async (req, res) => {
 });
 
 const getAllJournals = asyncHandler(async (req, res) => {
-  const journals = await JournalService.getAllJournals(req.query);
+  const id = req.user.id
+  const journals = await JournalService.getAllJournals(id as Types.ObjectId,req.query);
 
   res
     .status(status.OK)

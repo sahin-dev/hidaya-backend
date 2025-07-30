@@ -33,7 +33,7 @@ const getJournalById = async (id: string) => {
   return journal;
 };
 
-const getAllJournals = async (query: Record<string, unknown>) => {
+const getAllJournals = async (id: Types.ObjectId,query: Record<string, unknown>) => {
   const filterQuery: FilterQuery<IJournal> = {};
 
   if (query?.date) {
@@ -42,6 +42,7 @@ const getAllJournals = async (query: Record<string, unknown>) => {
 
     const nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1); // start of tomorrow
+    filterQuery.user = id
 
     filterQuery.createdAt = {
       $gte: date,
