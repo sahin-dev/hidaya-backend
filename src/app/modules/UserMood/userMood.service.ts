@@ -5,16 +5,19 @@ import UserMood from './userMood.model';
 import { IUserMood } from './userMood.interface';
 
 const saveUserMoodIntoDB = async (user: IAuth, payload: IUserMood) => {
-  const today =new Date(Date.now()).setHours(6,0,0,0);
+  const today = new Date(Date.now()).setHours(6,0,0,0);
   // today.setDate(today.getDate() + 1);
   
 
   payload.auth = user._id as any;
+  payload.date = new Date(today);
 
-  return await UserMood.findOneAndUpdate(
-    { auth: user._id, date: today },
+  console.log(payload)
+
+  return await UserMood.create(
+    // { auth: user._id, date: today },
     payload,
-    { upsert: true, setDefaultsOnInsert: true, runValidators: true, new: true }
+
   );
 };
 

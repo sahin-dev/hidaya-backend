@@ -8,6 +8,7 @@ const createSchema = z.object({
     description: z.string({
       required_error: 'Description is required',
     }),
+
   }),
 });
 
