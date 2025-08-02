@@ -47,14 +47,14 @@ const getAllJournals = async (id: Types.ObjectId,query: Record<string, unknown>)
 
     const nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1); // start of tomorrow
-    filterQuery.user = id
-     console.log(nextDate)
+
+
     filterQuery.createdAt = {
       $gte: date,
       $lte: nextDate,
     };
   }
-  return await Journal.find(filterQuery).sort({'createdAt':-1});
+  return await Journal.find({user:id}, filterQuery).sort({'createdAt':-1});
 };
 
 
