@@ -38,7 +38,7 @@ const getJournalById = async (id: string) => {
 };
 
 const getAllJournals = async (id: Types.ObjectId,query: Record<string, unknown>) => {
-  const filterQuery: FilterQuery<IJournal> = {};
+  const filterQuery: FilterQuery<IJournal> = {user:id};
 
   if (query?.date) {
     const date = new Date(query.date as string);
@@ -54,7 +54,7 @@ const getAllJournals = async (id: Types.ObjectId,query: Record<string, unknown>)
       $lte: nextDate,
     };
   }
-  return await Journal.find({user:id}, filterQuery).sort({'createdAt':-1});
+  return await Journal.find(filterQuery).sort({'createdAt':-1});
 };
 
 
