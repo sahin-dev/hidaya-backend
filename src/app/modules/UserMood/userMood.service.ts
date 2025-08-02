@@ -12,7 +12,6 @@ const saveUserMoodIntoDB = async (user: IAuth, payload: IUserMood) => {
   payload.auth = user._id as any;
   payload.date = new Date(today);
 
-  console.log(payload)
 
   return await UserMood.create(
     // { auth: user._id, date: today },

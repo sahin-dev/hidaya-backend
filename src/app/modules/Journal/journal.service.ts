@@ -7,11 +7,15 @@ import { FilterQuery, Types } from 'mongoose';
 const createJournal = async (id:Types.ObjectId,payload: IJournal) => {
 
   
-  let journal = await Journal.findOneAndUpdate({user:id},payload);
-  if (!journal){
+  // let journal = await Journal.findOneAndUpdate({user:id},payload, {new:true});
+
+  // if (!journal){
+  //   payload.user = id
+  //   journal = await Journal.create(payload)
+  // }
+
     payload.user = id
-    journal = await Journal.create(payload)
-  }
+    let journal = await Journal.create(payload)
 
   if (!journal) {
     throw new AppError(
@@ -38,18 +42,19 @@ const getAllJournals = async (id: Types.ObjectId,query: Record<string, unknown>)
 
   if (query?.date) {
     const date = new Date(query.date as string);
+   
     date.setHours(0, 0, 0, 0); // start of today
 
     const nextDate = new Date(date);
     nextDate.setDate(nextDate.getDate() + 1); // start of tomorrow
     filterQuery.user = id
-
+     console.log(nextDate)
     filterQuery.createdAt = {
       $gte: date,
       $lte: nextDate,
     };
   }
-  return await Journal.find(filterQuery).sort({'createdAt':-1}).limit(1);
+  return await Journal.find(filterQuery).sort({'createdAt':-1});
 };
 
 
