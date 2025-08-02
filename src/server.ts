@@ -20,6 +20,8 @@ import './app/modules/Agenda';
 
 let server: Server;
 
+const PORT = config.port || 5000
+
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   Logger.error('Uncaught Exception:', error);
@@ -45,7 +47,7 @@ async function bootstrap() {
     await mongoose.connect(config.db_url as string);
     console.log('🛢 Database connected successfully');
     await seedingAdmin();
-    server = app.listen(config.port, () => {
+    server = app.listen(PORT, () => {
       console.log(`🚀 Application is running on port ${config.port}`);
     });
 
