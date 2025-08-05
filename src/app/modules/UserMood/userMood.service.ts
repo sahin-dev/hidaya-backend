@@ -35,7 +35,27 @@ const getAllUserMoodList = async (
   return await UserMood.find(mongoQuery);
 };
 
+const getPreviousUserMood = async (user: IAuth, startDate: Date, endDate: Date) => {
+  const start = new Date(startDate);
+  start.setHours(6, 0, 0, 0);
+
+  const end = new Date(endDate);
+  end.setHours(6, 0, 0, 0);
+
+  const query: FilterQuery<IUserMood> = {
+    auth: user._id,
+    date: {
+      $gte: start,
+      $lte: end,
+    },
+  };
+
+  return await UserMood.find(query).sort({ date: 1 }); // optional: sort by date
+};
+
+
 export const UserMoodService = {
   saveUserMoodIntoDB,
   getAllUserMoodList,
+  getPreviousUserMood
 };
