@@ -54,6 +54,44 @@ const getActivitiesForToday = async (user: IAuth) => {
   });
 };
 
+// const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
+//   const now = new Date();
+//   const startOfDay = new Date(
+//     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+//   );
+
+//   const incFields: Partial<IActivity> = {};
+
+//   if (payload?.water) {
+//     incFields.water = Number(payload.water);
+//   }
+
+//   if (payload?.step) {
+//     incFields.step = Number(payload.step);
+//     incFields.calories = Number(payload.step) * 0.04;
+//   }
+
+//   if (payload?.calories) {
+//     incFields.calories = Number(payload.calories);
+//   }
+
+//   return await ActivityModel.findOneAndUpdate(
+//     {
+//       user: user._id,
+//       date: startOfDay,
+//     },
+//     { $inc: incFields },
+//     {
+//       new: true,
+//       upsert: true,
+//       runValidators: true,
+//       setDefaultsOnInsert: true,
+//     }
+//   );
+// };
+
+
+
 const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
   const now = new Date();
   const startOfDay = new Date(
@@ -62,19 +100,37 @@ const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
 
   const incFields: Partial<IActivity> = {};
 
+  // Step 1: Fetch existing activity
+  let activity = await ActivityModel.findOne({
+    user: user._id,
+    date: startOfDay,
+  });
+
+  // Initialize values if activity doesn't exist yet
+  const currentWater = activity?.water ?? 0;
+
+  // Step 2: Cap water increment to max 3000
   if (payload?.water) {
-    incFields.water = Number(payload.water);
+    const waterToAdd = Number(payload.water);
+    const remainingWater = 3000 - currentWater;
+
+    if (remainingWater > 0) {
+      incFields.water = Math.min(waterToAdd, remainingWater);
+    }
   }
 
+  // Step 3: Handle step and calories
   if (payload?.step) {
     incFields.step = Number(payload.step);
     incFields.calories = Number(payload.step) * 0.04;
   }
 
+  // If user explicitly sends calories (overriding step-based calories)
   if (payload?.calories) {
     incFields.calories = Number(payload.calories);
   }
 
+  // Step 4: Update with adjusted values
   return await ActivityModel.findOneAndUpdate(
     {
       user: user._id,
@@ -89,6 +145,7 @@ const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
     }
   );
 };
+
 
 const getAllActivityHistory = async (user: IAuth, date?: string) => {
   const query: FilterQuery<IActivity> = { user: user._id };
