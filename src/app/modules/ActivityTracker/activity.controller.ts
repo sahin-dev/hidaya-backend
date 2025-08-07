@@ -31,13 +31,22 @@ const updateActivity = asyncHandler(async (req, res) => {
     req.user,
     req.body
   );
+  let result:any;
+  
+
+  if(String(updateActivity) === "max"){
+    result = "Maximum water level reached"
+  }else{
+    result = updateActivity
+  }
+
 
   res
     .status(status.OK)
     .json(
       new AppResponse(
         status.OK,
-        updatedActivity,
+        result,
         'Activity updated successfully'
       )
     );

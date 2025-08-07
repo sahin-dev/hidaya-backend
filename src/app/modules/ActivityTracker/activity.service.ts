@@ -116,6 +116,8 @@ const updateActivity = async (user: IAuth, payload: Partial<IActivity>) => {
 
     if (remainingWater > 0) {
       incFields.water = Math.min(waterToAdd, remainingWater);
+    }else {
+      return "max"
     }
   }
 
