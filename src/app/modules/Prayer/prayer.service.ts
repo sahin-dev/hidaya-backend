@@ -16,8 +16,6 @@ const getPrayerTimes = async (user: IAuth) => {
     },
   });
 
-
-
   const timings = response.data.data.timings;
   const zone = response.data.data.meta.timezone
 

@@ -346,6 +346,9 @@ const getActivityHistoryByDateRange = async (
     },
   ]);
 
+
+
+
   const activityMap = new Map<string, any>();
 
   activities.forEach((group) => {
@@ -407,9 +410,36 @@ const getActivityHistoryByDateRange = async (
   return {
     user: user._id,
     calculation,
+    stepRatio:calculateStepRatio(sortedHistory),
     history: sortedHistory,
   };
 };
+
+const calculateStepRatio = (activities:any[])=>{
+  const max =  findMaxStep(activities)
+  if(max  <= 0){
+    activities.map( act => {
+      return act.step
+    })
+  }
+  let ratio = activities.map(act => {
+    return act.step/max
+  })
+  return ratio
+
+  
+}
+
+const findMaxStep = (activities:any[])=>{
+  let maxStep = -123456765;
+  activities.forEach( activity => {
+    if (activity.step > maxStep){
+      maxStep = activity.step
+    }
+  })
+
+  return maxStep
+}
 
 export const ActivityService = {
   createActivity,

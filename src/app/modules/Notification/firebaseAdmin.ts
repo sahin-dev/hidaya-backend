@@ -3,7 +3,6 @@ import service from './serviceAccount.json'
 
 try {
 
-
   admin.initializeApp({
     credential: admin.credential.cert(service as ServiceAccount),
   });
