@@ -34,8 +34,26 @@ const getPreviousUserMood = asyncHandler(async (req, res)=>{
   .json(new AppResponse(status.OK, result, "Mood fetched successfully"))
 })
 
+const updateUserMood = asyncHandler(async (req, res) => {
+  const { moodId } = req.params;  
+  const result = await UserMoodService.editUserMood(moodId, req.body);
+  res
+    .status(status.OK)
+    .json(new AppResponse(status.OK, result, 'Mood updated successfully'));
+});
+
+const deleteUserMood = asyncHandler(async (req, res) => {
+  const { moodId } = req.params;
+  await UserMoodService.deleteUserMood(moodId);
+  res
+    .status(status.OK)
+    .json(new AppResponse(status.OK, null, 'Mood deleted successfully'));
+});
+
 export const UserController = {
   saveMood,
   getAllUserMoodList,
-  getPreviousUserMood
+  getPreviousUserMood,
+  updateUserMood,
+  deleteUserMood
 };

@@ -53,9 +53,36 @@ const getPreviousUserMood = async (user: IAuth, startDate: Date, endDate: Date) 
   return await UserMood.find(query).sort({ date: 1 }); // optional: sort by date
 };
 
+const editUserMood = async (moodId: string, payload: Partial<IUserMood>) => {
+  const mood = await UserMood.findById(moodId);
+  if (!mood) {  
+    throw new Error('Mood not found');
+  }
+  
+  return await UserMood.findOneAndUpdate(
+    { _id: mood._id},
+   {title: payload.title, description: payload.description},
+    { new: true, upsert: true }
+  );
+}
+
+const deleteUserMood = async (moodId: string) => {
+  
+    const mood = await UserMood.findById(moodId);
+    if (!mood) {  
+      throw new Error('Mood not found');
+    }
+  return await UserMood.findOneAndDelete({
+   _id: mood._id,
+  });
+}
+
+
 
 export const UserMoodService = {
   saveUserMoodIntoDB,
   getAllUserMoodList,
-  getPreviousUserMood
+  getPreviousUserMood,
+  editUserMood,
+  deleteUserMood,
 };
