@@ -12,11 +12,10 @@ router
     validateRequest(MoodValidation.createSchema),
     UserController.saveMood
   )
-  
   .get(auth(), UserController.getAllUserMoodList);
   
   router
-  .route('/:moodId ')
+  .route('/:moodId')
   .put(auth(),UserController.updateUserMood) 
   .delete(auth(), UserController.deleteUserMood); 
 
