@@ -271,17 +271,16 @@ const getActivityHistoryByDateRange = async (
  
     // Find the previous Friday (assuming today is in the same week)
     const dayOfWeek = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  
+    
     const daysToSubtract = 7 - dayOfWeek; // Calculate how many days back to Friday
     const friday = new Date(today);
-    friday.setUTCDate(today.getUTCDate() - dayOfWeek);
-    console.log(friday)
+    friday.setUTCDate(today.getUTCDate() - (daysToSubtract-1));
+  
 
     fromDate = new Date(friday); // Friday
-    endDate = new Date(friday);
-    endDate.setUTCDate(friday.getUTCDate() + 7); // 6 days before Friday (last week's Friday)
-    console.log('fromDate:', fromDate)
-    console.log("enddate: ", endDate)
+    endDate = new Date(today);
+    // endDate.setUTCDate(friday.getUTCDate() + 7); // 6 days before Friday (last week's Friday)
+  
     // let startDate = Date.now()
     // let currentMin = new Date().getMinutes()
     // let currentHour = new Date().getHours()
@@ -390,8 +389,8 @@ const getActivityHistoryByDateRange = async (
   }
 
   // Reorganize the history to start with Friday and order accordingly
-  const daysOfWeek = ['Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
-  const sortedHistory: any = [];
+  const daysOfWeek = ['Sun', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon'];
+  const sortedHistory: any[] = [];
   daysOfWeek.forEach((day) => {
     const dayHistory = history.filter((item) => item.day === day);
     sortedHistory.push(...dayHistory);
@@ -407,28 +406,44 @@ const getActivityHistoryByDateRange = async (
     { totalStep: 0, totalWater: 0, totalCalories: 0 }
   );
 
+  if(query.week){
+    
+    const maxStep = findMaxStep(sortedHistory)
+    const mappedHistory = maxStep == 0? sortedHistory:sortedHistory.map( history => {
+      history.step = (history.step/maxStep)
+      
+      return history
+    })
+
+    return {
+      user: user._id,
+      calculation,
+      history:mappedHistory,
+    };
+  }
+  
+
   return {
     user: user._id,
     calculation,
-    stepRatio:calculateStepRatio(sortedHistory),
     history: sortedHistory,
   };
 };
 
-const calculateStepRatio = (activities:any[])=>{
-  const max =  findMaxStep(activities)
-  if(max  <= 0){
-    activities.map( act => {
-      return act.step
-    })
-  }
-  let ratio = activities.map(act => {
-    return act.step/max
-  })
-  return ratio
+// const calculateStepRatio = (activities:any[])=>{
+//   const max =  findMaxStep(activities)
+//   if(max  <= 0){
+//     activities.map( act => {
+//       return act.step
+//     })
+//   }
+//   let ratio = activities.map(act => {
+//     return act.step/max
+//   })
+//   return ratio
 
   
-}
+// }
 
 const findMaxStep = (activities:any[])=>{
   let maxStep = -123456765;

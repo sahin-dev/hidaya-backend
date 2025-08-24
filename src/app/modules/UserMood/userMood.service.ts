@@ -5,7 +5,8 @@ import UserMood from './userMood.model';
 import { IUserMood } from './userMood.interface';
 
 const saveUserMoodIntoDB = async (user: IAuth, payload: IUserMood) => {
-  const today = new Date(Date.now()).setHours(6,0,0,0);
+  const today = new Date(Date.now());
+  today.setHours(6,0,0,0)
   // today.setDate(today.getDate() + 1);
   
 
@@ -30,6 +31,13 @@ const getAllUserMoodList = async (
     const date = new Date(query.date as string);
     date.setHours(6, 0, 0, 0);
     mongoQuery.date = date;
+  }else{
+    const date = new Date(Date.now())
+    date.setHours(6,0,0,0)
+    mongoQuery.date = {
+      $gte:date,
+      $lte:new Date()
+    }
   }
 
   return await UserMood.find(mongoQuery);

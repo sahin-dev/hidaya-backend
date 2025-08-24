@@ -14,6 +14,8 @@ const getAllUserMoodList = asyncHandler(async (req, res) => {
   const {startDate, endDate} = req.query 
   let result;
 
+
+
   if(startDate && endDate){
     result = await UserMoodService.getPreviousUserMood(req.user, new Date(startDate as string), new Date(endDate as string))
   }
