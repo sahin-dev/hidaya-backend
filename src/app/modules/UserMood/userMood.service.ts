@@ -29,11 +29,11 @@ const getAllUserMoodList = async (
 
   if (query?.date) {
     const date = new Date(query.date as string);
-    date.setHours(6, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
     mongoQuery.date = date;
   }else{
     const date = new Date(Date.now())
-    date.setHours(6,0,0,0)
+    date.setHours(0,0,0,0)
     mongoQuery.date = {
       $gte:date,
       $lte:new Date()
