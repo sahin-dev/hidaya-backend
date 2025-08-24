@@ -6,7 +6,7 @@ import { IUserMood } from './userMood.interface';
 
 const saveUserMoodIntoDB = async (user: IAuth, payload: IUserMood) => {
   const today = new Date(Date.now());
-  today.setHours(6,0,0,0)
+  today.setHours(0,0,0,0)
   // today.setDate(today.getDate() + 1);
   
 
