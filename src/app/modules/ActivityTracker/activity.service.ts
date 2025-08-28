@@ -393,7 +393,7 @@ const getActivityHistoryByDateRange = async (
   }
 
   // Reorganize the history to start with Friday and order accordingly
-  const daysOfWeek = ['Sun', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon'];
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const sortedHistory: any[] = [];
   daysOfWeek.forEach((day) => {
     const dayHistory = history.filter((item) => item.day === day);
@@ -413,9 +413,6 @@ const getActivityHistoryByDateRange = async (
     sortedHistory.push({"_id":null,"date":new Date(next), "day":days[dayOfWeek+idx], 'calories':0, "step":0, "water":0}, )
     idx++
   }
-
-
-  
 
   const calculation = sortedHistory.reduce(
     (acc: any, curr: any) => {
