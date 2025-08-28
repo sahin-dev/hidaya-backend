@@ -263,22 +263,25 @@ const getActivityHistoryByDateRange = async (
   let fromDate: Date;
   let endDate: Date;
 
+  let dayToAdd = 0
+  const today = new Date();
+
   // If 'week' param is passed, set range to the past 7 days starting on Friday
   if (query.week) {
-    const today = new Date();
+    
     today.setUTCHours(0, 0, 0, 0);
 
- 
     // Find the previous Friday (assuming today is in the same week)
     const dayOfWeek = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    
     const daysToSubtract = 7 - dayOfWeek; // Calculate how many days back to Friday
+    dayToAdd = 6 - dayOfWeek
     const friday = new Date(today);
-    friday.setUTCDate(today.getUTCDate() - (daysToSubtract-1));
-  
+    friday.setUTCDate(today.getUTCDate() - (dayOfWeek));
+    
 
     fromDate = new Date(friday); // Friday
     endDate = new Date(today);
+    
     // endDate.setUTCDate(friday.getUTCDate() + 7); // 6 days before Friday (last week's Friday)
   
     // let startDate = Date.now()
@@ -323,6 +326,7 @@ const getActivityHistoryByDateRange = async (
       $gte: fromDate,
       $lte: endDate,
     },
+    
   };
 
   const activities = await ActivityModel.aggregate([
@@ -395,6 +399,23 @@ const getActivityHistoryByDateRange = async (
     const dayHistory = history.filter((item) => item.day === day);
     sortedHistory.push(...dayHistory);
   });
+
+  let dayRemainInThisWeek = dayToAdd
+  let dayOfWeek = today.getUTCDay()
+  let idx = 1
+  today.setUTCHours(0,0,0,0)
+  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+
+  while (idx <= dayRemainInThisWeek){
+    const now = new Date(Date.now())
+    let next = now.setUTCDate(now.getUTCDate() + idx)
+    sortedHistory.push({"_id":null,"date":new Date(next), "day":days[dayOfWeek+idx], 'calories':0, "step":0, "water":0}, )
+    idx++
+  }
+
+
+  
 
   const calculation = sortedHistory.reduce(
     (acc: any, curr: any) => {
