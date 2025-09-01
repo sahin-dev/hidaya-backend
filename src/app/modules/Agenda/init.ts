@@ -5,8 +5,6 @@ import config from "../../config";
 const mongodbUrl = config.db_url || "";
 
 
-
-
  function initAgenda() {
     console.log("Hi")
     if (!mongodbUrl) {  
@@ -16,8 +14,6 @@ const mongodbUrl = config.db_url || "";
     const agenda = new Agenda({
         db: { address: mongodbUrl, collection: "agendaJobs" }
     });
-
-
 
     return agenda;
 }

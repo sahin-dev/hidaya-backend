@@ -35,9 +35,10 @@ agenda.define("users:prayer", async ()=>{
 
 const scheduleJob = async (user:IAuth)=>{
     const prayers = await PrayerService.getPrayerTimes(user)
+    const userZone = await PrayerService.getUserZone(user)
 
-    prayers.forEach(async(prayer:{name:string, time:string, zone:string}) => {
-        const date = convertPrayerTimeToUTC(prayer.time, prayer.zone)
+    prayers.forEach(async(prayer:{name:string, time:string}) => {
+        const date = convertPrayerTimeToUTC(prayer.time, userZone)
         await agenda.schedule(date, "notification:prayer", {token:user.token, prayer})
     })
 }

@@ -17,7 +17,6 @@ const getPrayerTimes = async (user: IAuth) => {
   });
 
   const timings = response.data.data.timings;
-  const zone = response.data.data.meta.timezone
 
   if (!timings) {
     throw new Error('Could not retrieve prayer timings from the external API.');
@@ -28,6 +27,20 @@ const getPrayerTimes = async (user: IAuth) => {
     time: timings[item],
   }));
 };
+
+const getUserZone = async (user: IAuth) => {  
+  const city = user?.city || 'Riyadh';
+  const country = user?.country || 'Saudi Arabia';
+  const response = await axios.get(`http://api.aladhan.com/v1/timingsByCity`, {
+    params: {
+      city,
+      country,
+      method: 2,
+    },
+  }); 
+  const zone = response.data.data.meta.timezone
+  return zone
+}
 
 const updatePrayerIntoDB = async (
   user: IAuth,
@@ -132,4 +145,5 @@ export const PrayerService = {
   updatePrayerIntoDB,
   fetchAllPrayerLogsFromDB,
   getPrayerTimes,
+  getUserZone
 };

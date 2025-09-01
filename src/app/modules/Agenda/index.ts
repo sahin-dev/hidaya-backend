@@ -6,5 +6,6 @@ agenda.on('fail', (err, job) => console.error(`Job ${job.attrs.name} failed: ${e
 agenda.on('ready', async () => {
     console.log("Agenda is ready"); 
     agenda.start();
+    console.log("Agenda has started");
     await agenda.every('5 0 * * *', 'users:prayer');
 });
