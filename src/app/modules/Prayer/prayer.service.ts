@@ -31,15 +31,24 @@ const getPrayerTimes = async (user: IAuth) => {
 const getUserZone = async (user: IAuth) => {  
   const city = user?.city || 'Riyadh';
   const country = user?.country || 'Saudi Arabia';
-  const response = await axios.get(`http://api.aladhan.com/v1/timingsByCity`, {
-    params: {
-      city,
-      country,
-      method: 2,
-    },
-  }); 
-  const zone = response.data.data.meta.timezone
-  return zone
+
+  console.log("Fetching timezone for:", city, country)
+  try{  
+    
+    const response = await axios.get(`http://api.aladhan.com/v1/timingsByCity`, {
+      params: {
+        city,
+        country,
+        method: 2,
+      },
+    }); 
+    const zone = response.data.data.meta.timezone
+    return zone
+  }catch(err){
+    console.log("Error fetching timezone:", err)
+  }
+  
+
 }
 
 const updatePrayerIntoDB = async (

@@ -24,3 +24,9 @@ export interface IAuth extends Document {
   generateAccessToken(): string;
   generateRefreshToken(): string;
 }
+
+
+export interface IZone extends Document {
+  city: string;
+  zone: string;
+}

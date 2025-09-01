@@ -7,5 +7,5 @@ agenda.on('ready', async () => {
     console.log("Agenda is ready"); 
     agenda.start();
     console.log("Agenda has started");
-    await agenda.every('5 0 * * *', 'users:prayer');
+    await agenda.every('1 day', 'users:prayer');
 });

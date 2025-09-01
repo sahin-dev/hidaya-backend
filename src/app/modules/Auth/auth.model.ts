@@ -139,6 +139,7 @@ authSchema.methods.generateRefreshToken = function () {
   );
 };
 
+
 const Auth = mongoose.model<IAuth>('Auth', authSchema);
 
 export default Auth;

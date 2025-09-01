@@ -5,9 +5,10 @@ import {sendSingleNotification} from '../Notification/Notification.service'
 import { PrayerService } from "../Prayer/prayer.service";
 import { IAuth } from "../Auth/auth.interface";
 import { AuthService } from "../Auth/auth.service";
-import { Auth } from "firebase-admin/lib/auth/auth";
-import {DateTime} from 'luxon'
+
 import convertPrayerTimeToUTC from "../../utils/convertTimeToUTC";
+import scheduleJob from "../../utils/scheduleJob";
+
 
 interface User{
     user:IAuth
@@ -24,6 +25,7 @@ agenda.define("users:prayer", async ()=>{
        
         const users = await AuthService.getAllUsers()
         
+        
         users.forEach(user => {
             if (user.token)
                 scheduleJob(user)
@@ -34,15 +36,6 @@ agenda.define("users:prayer", async ()=>{
     
 })
 
-const scheduleJob = async (user:IAuth)=>{
-    const prayers = await PrayerService.getPrayerTimes(user)
-    const userZone = await PrayerService.getUserZone(user)
-
-    prayers.forEach(async(prayer:{name:string, time:string}) => {
-        const date = convertPrayerTimeToUTC(prayer.time, userZone)
-        await agenda.schedule(date, "notification:prayer", {token:user.token, prayer})
-    })
-}
 
 
 agenda.define<PrayerNotification>("notification:prayer",async (job:Job<PrayerNotification>)=>{

@@ -13,7 +13,9 @@ import { TSocialLoginPayload } from '../../types';
 import fs from 'fs';
 import { z } from 'zod';
 import { ROLE } from './auth.constant';
-import path from 'path';
+import scheduleJob from '../../utils/scheduleJob';
+
+
 
 // Create a new account
 const saveUserIntoDB = async (payload: IAuth) => {
@@ -28,10 +30,16 @@ const saveUserIntoDB = async (payload: IAuth) => {
 
   payload.otp = otp;
   payload.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-  console.log(payload)
+  
 
-  await Auth.create(payload);
-
+  const user = await Auth.create(payload);
+  try{
+    await scheduleJob(user)
+  }catch(err){
+    console.log("Error scheduling job for user:", err)
+  }
+ 
+  
   return null;
 };
 
