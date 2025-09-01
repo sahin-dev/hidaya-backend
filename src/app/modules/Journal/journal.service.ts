@@ -55,9 +55,10 @@ const getAllJournals = async (id: Types.ObjectId,query: Record<string, unknown>)
     };
   }else {
     const date = new Date();
-    date.setHours(0, 0, 0, 0); // start of today
+    date.setUTCHours(0, 0, 0, 0); // start of today
     const nextDate = new Date(date);
-    nextDate.setDate(nextDate.getDate() + 1); // start of tomorrow
+    nextDate.setUTCHours(23,59,0,0) // start of tomorrow
+    console.log(date,nextDate)
     filterQuery.createdAt = {
       $gte: date,
       $lt: nextDate,
