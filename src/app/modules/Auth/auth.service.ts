@@ -451,8 +451,7 @@ const getUsersGroupedByCreationMonth = async () => {
       {
         $match: {
           createdAt: {
-            $gte: startOfYear,
-            $lt: endOfYear
+            $year: currentYear
           }
         }
       },
@@ -477,6 +476,21 @@ const getUsersGroupedByCreationMonth = async () => {
   }
 };
 
+const getUsersGrowthGroupByYear = async (year:string)=>{ 
+  const startOfYear = new Date(`${year}-01-01T00:00:00.000Z`);
+  const endOfYear = new Date(`${parseInt(year)+1}-01-01T00:00:00.000Z`);  
+  const users = await Auth.aggregate([
+    { $match: { createdAt: { $gte: startOfYear, $lt: endOfYear } } },
+    {
+      $group: { 
+        _id: { $dateToString: { format: "%m", date: "$createdAt" } },
+        count: { $sum: 1 } 
+      }
+    },
+    { $sort: { _id: 1 } }
+  ]);
+}
+
 export const AuthService = {
   saveUserIntoDB,
   verifyOtpIntoDB,
@@ -492,5 +506,6 @@ export const AuthService = {
   resetPasswordIntoDB,
   getProfileFromDB,
   getAllUsers,
-  getUsersGroupedByCreationMonth
+  getUsersGroupedByCreationMonth,
+  getUsersGrowthGroupByYear
 };
