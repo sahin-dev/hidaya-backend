@@ -4,7 +4,12 @@ import Hadith from './hadith.model';
 import { IHadith } from './hadith.interface';
 
 const createHadith = async (payload: IHadith) => {
-  const hadith = await Hadith.create(payload);
+  const date = new Date(payload.date)
+  if (date < new Date(Date.now()))
+  {
+    throw new AppError(status.BAD_REQUEST, "Date must be in future")
+  }  
+const hadith = await Hadith.create(payload);
 
   if (!hadith) {
     throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to create hadith');
