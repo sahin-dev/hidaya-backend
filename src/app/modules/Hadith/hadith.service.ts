@@ -5,10 +5,14 @@ import { IHadith } from './hadith.interface';
 
 const createHadith = async (payload: IHadith) => {
   const date = new Date(payload.date)
-  if (date < new Date(Date.now()))
+  let currentDate = new Date().setUTCHours(0,0,0,0)
+  console.log(payload)
+  console.log(currentDate)
+  if (date < new Date(currentDate))
   {
     throw new AppError(status.BAD_REQUEST, "Date must be in future")
   }  
+
 const hadith = await Hadith.create(payload);
 
   if (!hadith) {
