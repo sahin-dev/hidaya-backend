@@ -1,6 +1,7 @@
 import status from 'http-status';
 import { AppResponse, asyncHandler } from '../../utils';
 import { AdminService } from './admin.service';
+import { AuthService } from '../Auth/auth.service';
 
 const getAdminStats = asyncHandler(async (req, res) => {
   const stats = await AdminService.fetchAdminStats();
@@ -47,9 +48,23 @@ const getAllUsers = asyncHandler(async (req, res) => {
     .json(new AppResponse(status.OK, user, 'Users retrieved successfully'));
 });
 
+
+
+const updateAdminProfile = asyncHandler(async (req, res) => {
+  const result = await AuthService.updateProfileIntoDB(
+    req.user,
+    req.body,
+    req.file
+  );
+
+  res
+    .status(status.OK)
+    .json(new AppResponse(status.OK, result, 'Profile update successfully'));
+});
 export const AdminController = {
   getAdminStats,
   blockUser,
   getUserById,
   getAllUsers,
+  updateAdminProfile
 };

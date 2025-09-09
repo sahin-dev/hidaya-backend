@@ -231,9 +231,6 @@ const updateProfileIntoDB = async (
       throw new AppError(status.NOT_FOUND, 'User not exists!');
     }
 
-
-    
-
     if (file?.path) {
       if (user?.image) {
         try {
@@ -246,6 +243,8 @@ const updateProfileIntoDB = async (
       let url = `${config.backend_url}/${resolvedPath}`
 
       payload.image = url
+
+      console.log(payload)
     }
 
     return await Auth.findByIdAndUpdate(user._id, payload, {

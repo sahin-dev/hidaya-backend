@@ -1,8 +1,9 @@
 import status from 'http-status';
 import QueryBuilder from '../../builders/QueryBuilder';
-import { AppError } from '../../utils';
+import { AppError, AppResponse, asyncHandler } from '../../utils';
 import Auth from '../Auth/auth.model'; // adjust path if needed
 import { subDays } from 'date-fns';
+import { AuthService } from '../Auth/auth.service';
 
 const fetchAdminStats = async () => {
   const now = new Date();
@@ -93,9 +94,11 @@ const getAllUsersFromDB = async (query: Record<string, unknown>) => {
   return { data, meta };
 };
 
+
+
 export const AdminService = {
   fetchAdminStats,
   blockUser,
   getUserById,
-  getAllUsersFromDB,
+  getAllUsersFromDB
 };

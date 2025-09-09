@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { auth } from '../../middlewares';
 import { AdminController } from './admin.controller';
 import { ROLE } from '../Auth/auth.constant';
+import { upload } from '../../lib';
 
 const router = Router();
 
@@ -28,5 +29,7 @@ router.get(
   auth(ROLE.SUPER_ADMIN, ROLE.ADMIN),
   AdminController.getAllUsers
 );
+
+router.put("/profile", auth(ROLE.ADMIN, ROLE.SUPER_ADMIN),upload.single('file'), AdminController.updateAdminProfile)
 
 export const AdminRoutes = router;
